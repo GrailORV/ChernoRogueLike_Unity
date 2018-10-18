@@ -3,21 +3,27 @@ using UnityEditor;
 using UnityEngine;
 
 
-[CustomEditor(typeof(SceneManager))]
+[CustomEditor(typeof(SceneManagerScript))]
 public class SceneListEditor : Editor
 {
-    SceneManager sceneManager = null;
-
+    SceneManagerScript sms = null;
     bool _isOpen = false;
 
     void OnEnable()
     {
-        sceneManager = (SceneManager)target;
+        sms = target as SceneManagerScript;
     }
 
     public override void OnInspectorGUI()
     {
         //base.OnInspectorGUI();
+
+        
+
+        if (sms.sceneNameList==null)
+        {
+            sms.sceneNameList = new List<string>();
+        }
 
         bool isOpen = EditorGUILayout.Foldout(_isOpen, "SceneList");
         if (_isOpen != isOpen)
@@ -28,16 +34,16 @@ public class SceneListEditor : Editor
 
         if (isOpen)
         {
-            for (int i = 0; i < sceneManager.sceneNameList.Count; )
+            for (int i = 0; i < sms.sceneNameList.Count; )
             {
-                var oldScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(sceneManager.sceneNameList[i]);
+                var oldScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(sms.sceneNameList[i]);
                 EditorGUILayout.BeginHorizontal();
                 var newScene = EditorGUILayout.ObjectField("Scene", oldScene, typeof(SceneAsset), false) as SceneAsset;
                 var newPath = AssetDatabase.GetAssetPath(newScene);
-                sceneManager.sceneNameList[i] = newPath;
+                sms.sceneNameList[i] = newPath;
                 if(GUILayout.Button("-",GUILayout.Width(32)))
                 {
-                    sceneManager.sceneNameList.RemoveAt(i);
+                    sms.sceneNameList.RemoveAt(i);
                     continue;
                 }
                 EditorGUILayout.EndHorizontal();
@@ -49,7 +55,7 @@ public class SceneListEditor : Editor
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("+", GUILayout.Width(32)))
             {
-                sceneManager.sceneNameList.Add(null);
+                sms.sceneNameList.Add(null);
             }
             EditorGUILayout.EndHorizontal();
         }
