@@ -17,7 +17,9 @@ Shader "UI/Fade"
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip("Use Alpha Clip", Float) = 0
 
+		_MaskTex("Mask Texture", 2D) = "white"{}
 		_FadeTime("Fade Time", Range(0,1)) = 0
+
 	}
 
 		SubShader
@@ -83,6 +85,7 @@ Shader "UI/Fade"
 				fixed4 _TextureSampleAdd;
 				float4 _ClipRect;
 				float4 _MainTex_ST;
+				sampler2D _MaskTex;
 				float _FadeTime;
 
 				v2f vert(appdata_t v)
@@ -96,13 +99,13 @@ Shader "UI/Fade"
 					OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
 
 					OUT.color = v.color * _Color;
-					OUT.color.a = _FadeTime;
 					return OUT;
 				}
 
 				fixed4 frag(v2f IN) : SV_Target
 				{
 					half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
+					color.a = ceil(_FadeTime*1.001 - tex2D(_MaskTex, IN.texcoord).a);
 
 					#ifdef UNITY_UI_CLIP_RECT
 					color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
