@@ -4,6 +4,15 @@ using UnityEngine.UI;
 
 public class Fade : MonoBehaviour
 {
+    [SerializeField]
+    private bool FadeEnable = true;
+
+    [SerializeField]
+    private Texture MaskTexture = null;
+
+    [SerializeField]
+    private Color FadeColor;
+
     public enum FadeMode
     {
         FM_None,
@@ -21,6 +30,19 @@ public class Fade : MonoBehaviour
     private static float fadeRate = 0;
     private static Material mat;
 
+    public Color FadeColor1
+    {
+        get
+        {
+            return FadeColor;
+        }
+
+        set
+        {
+            FadeColor = value;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -29,7 +51,10 @@ public class Fade : MonoBehaviour
         fadeEndEvent.RemoveAllListeners();
         fadeTimer = 0;
         fadeRate = 0;
-        mat = GetComponent<Image>().material;
+        mat = GetComponentInChildren<Image>().material;
+        mat.SetTexture("_MaskTex", MaskTexture);
+        mat.SetColor("_Color", FadeColor1);
+        GetComponentInChildren<Image>().enabled = FadeEnable;
     }
 
     // Update is called once per frame
@@ -57,6 +82,7 @@ public class Fade : MonoBehaviour
             if (CurrentMode == FadeMode.FM_FadeIn)
             {
                 mat.SetFloat("_FadeTime", 0.0f);
+                script.gameObject.GetComponentInChildren<Image>().enabled = false;
             }
             else
             {
@@ -85,6 +111,8 @@ public class Fade : MonoBehaviour
         {
             return;
         }
+
+        script.gameObject.GetComponentInChildren<Image>().enabled = true;
 
         if (time < Mathf.Epsilon)
         {

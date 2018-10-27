@@ -20,6 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4368902021579320}
   - component: {fileID: 114379648686086512}
+  - component: {fileID: 114945831183048072}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -37,7 +38,6 @@ GameObject:
   - component: {fileID: 224759074414093002}
   - component: {fileID: 222008710139243346}
   - component: {fileID: 114018661446096378}
-  - component: {fileID: 114369789638139542}
   m_Layer: 5
   m_Name: FadeBlind
   m_TagString: Untagged
@@ -120,17 +120,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &114369789638139542
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1805868743767328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbc0257bbb87a0a4f89c268f93ed7135, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114379648686086512
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -165,6 +154,20 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+--- !u!114 &114945831183048072
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1660739634714852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc0257bbb87a0a4f89c268f93ed7135, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FadeEnable: 0
+  MaskTexture: {fileID: 2800000, guid: c2b9b04136766b04a97965a90465c9ca, type: 3}
+  FadeColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!222 &222008710139243346
 CanvasRenderer:
   m_ObjectHideFlags: 1

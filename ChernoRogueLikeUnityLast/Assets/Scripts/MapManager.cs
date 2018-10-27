@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MapManager : MonoBehaviour
 {
@@ -18,18 +16,18 @@ public class MapManager : MonoBehaviour
 
     void Start()
     {
-        if(!WallPrefab)
-        {
-            return;
-        }
+        //if(!WallPrefab)
+        //{
+        //    return;
+        //}
 
-        for (int x = 0; x < 300; x++)
-        {
-            for (int z = 0; z < 300; z++)
-            {
-                Instantiate(WallPrefab, new Vector3(x, 0, z), Quaternion.identity);
-            }
-        }
+        //for (int x = 0; x < 100; x++)
+        //{
+        //    for (int z = 0; z < 300; z++)
+        //    {
+        //        Instantiate(WallPrefab, new Vector3(x, 0, z), Quaternion.identity);
+        //    }
+        //}
     }
 
     // Update is called once per frame
