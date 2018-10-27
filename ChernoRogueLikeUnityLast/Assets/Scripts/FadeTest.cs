@@ -1,9 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class FadeTest : MonoBehaviour
 {
+
+    private void Start()
+    {
+        Fade.FadeStart(Fade.FadeMode.FM_FadeIn, 1.0f);
+    }
 
     // Update is called once per frame
     void Update()
