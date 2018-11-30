@@ -33,9 +33,17 @@ public class OptionContller : MonoBehaviour {
 
     private void Update()
     {
+
+    }
+
+    public void BGMApply()
+    {
         Int32.TryParse(_bgmInputfield.text, out _bgmVolume);
         _bgmSlider.value = _bgmVolume;
+    }
 
+    public void SEApply()
+    {
         Int32.TryParse(_seInputfield.text, out _seVolume);
         _seSlider.value = _seVolume;
     }
