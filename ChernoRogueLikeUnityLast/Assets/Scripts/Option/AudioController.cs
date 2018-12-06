@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AudioContller : SinglTonMonoBehaviour<AudioContller> {
+public class AudioController : SinglTonMonoBehaviour<AudioController> {
 
     //ボリューム保存用のkeyとデフォルト値
     private const string BGM_VOLUME_KEY = "BGM_VOLUME_KEY";

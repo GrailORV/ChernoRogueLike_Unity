@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SystemContller : MonoBehaviour {
+public class SystemController : MonoBehaviour {
 
     // ゲームの速度と文字送りの速度のkeyとデフォルト値
     private const string GAME_SPEED_KEY = "GAME_SPEED_KEY";
