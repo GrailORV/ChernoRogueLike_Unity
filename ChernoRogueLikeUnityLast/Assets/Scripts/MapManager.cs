@@ -94,33 +94,35 @@ public class MapManager : MonoBehaviour
             for (uint h = 0; h < _Width; h++)
             {
                 Vector3 pos = new Vector3(h, 0, -v);
-                GameObject obj = new GameObject();
+                GameObject obj;
                 Material mat;
                 _FloorMapData[h, v] = (byte)values[h];
                 switch ((EFloorData)values[h])
                 {
                     case EFloorData.FLOOR:
-                        obj = Instantiate(floorPrefab, pos, Quaternion.identity);
+                        obj = Instantiate(floorPrefab, pos, Quaternion.Euler(0, 180, 0));
                         mat = obj.GetComponentInChildren<Renderer>().material;
                         mat.SetTexture("_MainTex", _FloorTextures[category]);
                         obj.transform.parent = transform;
+                        _FloorObjects[h, v] = obj;
                         break;
                     case EFloorData.WALL:
                         obj = Instantiate(wallPrefab, pos, Quaternion.identity);
                         mat = obj.GetComponentInChildren<Renderer>().material;
                         mat.SetTexture("_MainTex", _WallTextures[category]);
                         obj.transform.parent = transform;
+                        _FloorObjects[h, v] = obj;
                         break;
                     case EFloorData.WATER:
                         obj = Instantiate(waterPrefab, pos, Quaternion.identity);
                         mat = obj.GetComponentInChildren<Renderer>().material;
                         mat.SetTexture("_MainTex", _WaterTextures[category]);
                         obj.transform.parent = transform;
+                        _FloorObjects[h, v] = obj;
                         break;
                     default:
                         break;
                 }
-                _FloorObjects[h, v] = obj;
             }
         }
 
