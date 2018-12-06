@@ -30,6 +30,9 @@ public class AudioContller : SinglTonMonoBehaviour<AudioContller> {
     // 全部のAudioを所持
     private Dictionary<string, AudioClip> _bgmDic, _seDic;
 
+    [SerializeField]
+    private Toggle _apply, _cansel;
+
     // Start関数より先に起こす処理
     private void Awake()
     {
