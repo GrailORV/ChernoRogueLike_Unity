@@ -46,6 +46,7 @@ public class Fade : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        gameObject.hideFlags = HideFlags.HideInHierarchy;
         script = this;
         CurrentMode = FadeMode.FM_None;
         fadeEndEvent.RemoveAllListeners();
