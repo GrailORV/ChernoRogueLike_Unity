@@ -4,32 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OptionController : SinglTonMonoBehaviour<OptionController> {
+public class OptionController : SingletonMonoBehaviour<OptionController> {
+
+    static GameObject _option;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private void InitOption()
+    private static void Init()
     {
-        var optionController = Resources.Load("Prefabs/OptionMenu") as GameObject;
-        Instantiate(optionController);
-        GameObject.DontDestroyOnLoad(optionController);
+        _option = Resources.Load("Prefabs/OptionMenu") as GameObject;
+        Instantiate(_option);
+        GameObject.DontDestroyOnLoad(_option);
     }
 
-    //private void Awake()
-    //{
-    //    if(this != Instance)
-    //    {
-    //        Destroy(this);
-    //        return;
-    //    }
-
-    //    DontDestroyOnLoad(this.gameObject);
-    //}
+    private void Start()
+    {
+        
+    }
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-
+            _option.SetActive(!_option.activeSelf);
         }
     }
 }

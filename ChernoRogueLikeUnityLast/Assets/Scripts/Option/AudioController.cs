@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AudioController : SinglTonMonoBehaviour<AudioController> {
+public class AudioController : SingletonMonoBehaviour<AudioController> {
 
     //ボリューム保存用のkeyとデフォルト値
     private const string BGM_VOLUME_KEY = "BGM_VOLUME_KEY";
@@ -30,8 +30,9 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
     // 全部のAudioを所持
     private Dictionary<string, AudioClip> _bgmDic, _seDic;
 
+    // 変更確定用のボタン
     [SerializeField]
-    private Toggle _apply, _cansel;
+    private Button _apply, _cansel;
 
     // Start関数より先に起こす処理
     private void Awake()
@@ -142,29 +143,29 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
     {
         AttachBGMSource.volume = BGMVolume;
 
-        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, BGMVolume);
+        OnClickApply(BGM_VOLUME_KEY, BGMVolume);
     }
 
     public void ChangeSEVolume(float SEVolume)
     {
         AttachSESource.volume = SEVolume;
 
-        PlayerPrefs.SetFloat(SE_VOLUME_KEY, SEVolume);
+        OnClickApply(SE_VOLUME_KEY, SEVolume);
     }
 
-    public void ChangeBGMVolumeInputField(float BGMVolume)
+    //======================================================================================
+    // 設定確定
+    //======================================================================================
+    public void OnClickApply(string key,float Volume)
     {
-        AttachBGMSource.volume = BGMVolume;
-
-        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, BGMVolume);
+        PlayerPrefs.SetFloat(key, Volume);
     }
 
-    public void ChangeSEVolumeInputField(float SEVolume)
+    public void OnClickChancel()
     {
-        AttachSESource.volume = SEVolume;
-
-        PlayerPrefs.SetFloat(SE_VOLUME_KEY, SEVolume);
+        
     }
+
 
     // Update is called once per frame
     void Update()

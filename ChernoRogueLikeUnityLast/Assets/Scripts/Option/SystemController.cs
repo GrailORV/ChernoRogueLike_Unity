@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SystemController : MonoBehaviour {
+public class SystemController : SingletonMonoBehaviour<SystemController> {
 
     // ゲームの速度と文字送りの速度のkeyとデフォルト値
     private const string GAME_SPEED_KEY = "GAME_SPEED_KEY";
@@ -37,7 +37,7 @@ public class SystemController : MonoBehaviour {
 
     public void ChangeMesssageSpeed(float speed)
     {
-        // ここでゲームスピードに変更を加える
+        // ここで文字送り速度に変更を加える
 
 
         PlayerPrefs.SetFloat(MESSAGE_SPEED_KEY, speed);
