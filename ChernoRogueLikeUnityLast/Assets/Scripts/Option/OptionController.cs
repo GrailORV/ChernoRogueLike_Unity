@@ -6,26 +6,48 @@ using UnityEngine.UI;
 
 public class OptionController : SingletonMonoBehaviour<OptionController> {
 
-    static GameObject _option;
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Init()
     {
-        _option = Resources.Load("Prefabs/OptionMenu") as GameObject;
-        Instantiate(_option);
-        GameObject.DontDestroyOnLoad(_option);
+        var obj = Resources.Load("Prefabs/OptionMenu") as GameObject;
+        Instantiate(obj);
+    }
+
+    private void Awake()
+    {
+        if (this != Instance)
+        {
+            Destroy(this);
+            return;
+        }
     }
 
     private void Start()
     {
-        
+
     }
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Escape))
         {
-            _option.SetActive(!_option.activeSelf);
+            CloseOption();
+        }
+    }
+
+    /// <summary>
+    /// オプションを閉じる
+    /// </summary>
+    public void CloseOption()
+    {
+        // 変更していて確定前だったら確認する
+        // 変更しない場合変更前の状態にすべて戻す
+
+
+        // オプションを非表示にする
+        foreach (Transform child in this.gameObject.transform)
+        {
+            child.gameObject.SetActive(!child.gameObject.activeSelf);
         }
     }
 }

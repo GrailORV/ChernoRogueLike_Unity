@@ -32,7 +32,12 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
 
     // 変更確定用のボタン
     [SerializeField]
-    private Button _apply, _cansel;
+    private Button _applyButton, _cancelButton;
+
+    [SerializeField]
+    private Slider _BGMSlider, _SESlider;
+
+    private float _beforeBGM, _beforeSE;
 
     // Start関数より先に起こす処理
     private void Awake()
@@ -69,9 +74,15 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     // Use this for initialization
     void Start()
     {
+        _beforeBGM = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFULT);
+        _beforeSE = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFULT);
+
         // 音量をセーブされている所から値を設定
-        AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFULT);
-        AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFULT);
+        AttachBGMSource.volume = _beforeBGM;
+        AttachSESource.volume = _beforeSE;
+
+        _BGMSlider.value = _beforeBGM;
+        _SESlider.value = _beforeSE;
     }
 
     //======================================================================================
@@ -142,30 +153,30 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     public void ChangeBGMVolume(float BGMVolume)
     {
         AttachBGMSource.volume = BGMVolume;
-
-        OnClickApply(BGM_VOLUME_KEY, BGMVolume);
     }
 
     public void ChangeSEVolume(float SEVolume)
     {
         AttachSESource.volume = SEVolume;
-
-        OnClickApply(SE_VOLUME_KEY, SEVolume);
     }
 
     //======================================================================================
-    // 設定確定
+    // 設定確定 or キャンセル
     //======================================================================================
-    public void OnClickApply(string key,float Volume)
+    public void OnClickApply()
     {
-        PlayerPrefs.SetFloat(key, Volume);
+        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, AttachBGMSource.volume);
+        PlayerPrefs.SetFloat(SE_VOLUME_KEY, AttachSESource.volume);
     }
 
     public void OnClickChancel()
     {
-        
-    }
+        AttachBGMSource.volume = _beforeBGM;
+        AttachSESource.volume = _beforeSE;
 
+        _BGMSlider.value = _beforeBGM;
+        _SESlider.value = _beforeSE;
+    }
 
     // Update is called once per frame
     void Update()
