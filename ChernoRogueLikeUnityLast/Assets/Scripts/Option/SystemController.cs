@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class SystemController : SingletonMonoBehaviour<SystemController> {
@@ -12,8 +10,12 @@ public class SystemController : SingletonMonoBehaviour<SystemController> {
     private const float GAME_SPEED_DEFULT = 0.5f;
     private const float MESSAGE_SPEED_DEFULT = 0.5f;
 
+    // 各種スライダー
     [SerializeField]
     private Slider[] _slider;
+
+    [SerializeField]
+    private Button[] _buttons;
 
     // Use this for initialization
     void Start () {
@@ -25,21 +27,29 @@ public class SystemController : SingletonMonoBehaviour<SystemController> {
 
 
     //======================================================================================
-    // 音量変更
+    // ゲームスピード変更
     //======================================================================================
     public void ChangeGameSpeed(float speed)
     {
         // ここでゲームスピードに変更を加える
 
-
-        PlayerPrefs.SetFloat(GAME_SPEED_KEY, speed);
     }
 
+    //======================================================================================
+    // 文字送り速度変更
+    //======================================================================================
     public void ChangeMesssageSpeed(float speed)
     {
         // ここで文字送り速度に変更を加える
 
+    }
 
-        PlayerPrefs.SetFloat(MESSAGE_SPEED_KEY, speed);
+    //======================================================================================
+    // 変更確定
+    //======================================================================================
+    public void OnClickApplyButton()
+    {
+        PlayerPrefs.SetFloat(GAME_SPEED_KEY, _slider[0].value);
+        PlayerPrefs.SetFloat(MESSAGE_SPEED_KEY, _slider[1].value);
     }
 }
