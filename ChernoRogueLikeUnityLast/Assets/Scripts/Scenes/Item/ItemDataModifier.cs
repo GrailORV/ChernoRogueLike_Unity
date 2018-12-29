@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -56,7 +55,7 @@ public class ItemDataModifier
         var itemDataList = new List<ItemData>();
         for (int i = 0; i < lineLength; i++)
         {
-            Debug.LogFormat("{0}行目 : {1}", i, lines[i]);
+            //Debug.LogFormat("{0}行目 : {1}", i, lines[i]);
 
             // 改行文字を削除
             lines[i] = lines[i].Replace("\r", "").Replace("\n", "");
