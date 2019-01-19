@@ -48,12 +48,6 @@ public class ItemUIControl : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        // 初期化
-        Init();
-    }
-
     void Update()
     {
         if(_itemWindowObj.activeSelf)
@@ -80,7 +74,7 @@ public class ItemUIControl : MonoBehaviour
         _itemWindowObj.SetActive(false);
 
         // アイテムの生成
-        CreateItemObject();               
+        CreateItemObject();
     }
 
     /// <summary>
