@@ -2,24 +2,9 @@
 
 public class OptionController : SingletonMonoBehaviour<OptionController> {
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Init()
-    {
-        var obj = Resources.Load("Prefabs/OptionMenu") as GameObject;
-        Instantiate(obj);
-    }
-
-    private void Awake()
-    {
-        if (this != Instance)
-        {
-            Destroy(this);
-            return;
-        }
-    }
-
     private void Update()
     {
+        // Escapeキーでオプションを閉じる
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             CloseOption();

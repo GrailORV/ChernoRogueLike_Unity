@@ -33,10 +33,20 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     [SerializeField]
     private Button _applyButton, _cancelButton;
 
-    [SerializeField]
-    private Slider _BGMSlider, _SESlider;
+    // 音量変更スライダー
+    [SerializeField] private Slider _BGMSlider = null;
+    [SerializeField] private Slider _SESlider = null;
 
-    private float _beforeBGM, _beforeSE;
+    // デフォルトのBGMとSEの音量
+    private float _beforeBGM = 0.0f;
+    private float _beforeSE = 0.0f;
+    
+    // 音量の変更タイプ
+    public enum ChangeType
+    {
+        BGM,
+        SE
+    };
 
     // Start関数より先に起こす処理
     private void Awake()
@@ -73,6 +83,7 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     // Use this for initialization
     void Start()
     {
+        // 各ボリュームの初期化
         _beforeBGM = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFULT);
         _beforeSE = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFULT);
 
@@ -80,19 +91,20 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
         AttachBGMSource.volume = _beforeBGM;
         AttachSESource.volume = _beforeSE;
 
+        // スライダーの値の初期化
         _BGMSlider.value = _beforeBGM;
         _SESlider.value = _beforeSE;
     }
 
-    //======================================================================================
-    // BGM
-    //======================================================================================
     /// <summary>
-    /// 指定したファイル名をBGMを流す。ただしすでに流れている場合は前の曲をフェードアウトさせてから。
-    /// 第二引数のfadeSpeedRateに指定した割合でフェードアウトするスピードが変わる
+    /// BGMの再生
+    /// ほかのBGMが流れている場合はフェードアウトさせてから再生
     /// </summary>
+    /// <param name="bgmName">流したいBGMの名前</param>
+    /// <param name="fadeSpeedRate">前の曲をフェードアウトさせる長さ</param>
     public void PlayBGM(string bgmName, float fadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH)
     {
+        // BGMがない場合はログを表示しスルー
         if (!_bgmDic.ContainsKey(bgmName))
         {
             Debug.LogWarning(bgmName + "という名前のBGMはありません");
@@ -123,10 +135,11 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
         _isFadeOut = true;
     }
 
-    //======================================================================================
-    // SE
-    //======================================================================================
-
+    /// <summary>
+    /// SEを再生
+    /// </summary>
+    /// <param name="seName">流したいSEの名前</param>
+    /// <param name="delay">遅らせて再生したい場合は任意の値を入力（defaultは0）</param>
     public void PlaySE(string seName, float delay = 0.0f)
     {
         if (!_seDic.ContainsKey(seName))
@@ -138,38 +151,50 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
         Invoke("DelayPlaySE", delay);
     }
 
+    /// <summary>
+    /// 指定されたSEを再生
+    /// </summary>
     private void DelayPlaySE()
     {
         // ここでSEを鳴らす
         AttachSESource.PlayOneShot(_seDic[_nextSEName] as AudioClip);
     }
 
-
-    //======================================================================================
-    // 音量変更
-    //======================================================================================
-
-    public void ChangeBGMVolume(float BGMVolume)
+    /// <summary>
+    /// 音量調節
+    /// </summary>
+    /// <param name="volume">変更したい音量</param>
+    /// <param name="changeType">BGM or SE</param>
+    public void ChangeVolume(float volume ,ChangeType changeType)
     {
-        AttachBGMSource.volume = BGMVolume;
+        switch(changeType)
+        {
+            case ChangeType.BGM:
+                AttachBGMSource.volume = volume;
+                break;
+
+            case ChangeType.SE:
+                AttachSESource.volume = volume;
+                break;
+        }
     }
 
-    public void ChangeSEVolume(float SEVolume)
-    {
-        AttachSESource.volume = SEVolume;
-    }
-
-    //======================================================================================
-    // 設定確定 or キャンセル
-    //======================================================================================
+    /// <summary>
+    /// Applyボタンを押すと変更が保存される
+    /// </summary>
     public void OnClickApply()
     {
+        // PlayerPrefsに値を保存
         PlayerPrefs.SetFloat(BGM_VOLUME_KEY, AttachBGMSource.volume);
         PlayerPrefs.SetFloat(SE_VOLUME_KEY, AttachSESource.volume);
     }
 
+    /// <summary>
+    /// Chancelボタンを押すと変更前の値に修正される
+    /// </summary>
     public void OnClickChancel()
     {
+        // 実行時の値を代入
         AttachBGMSource.volume = _beforeBGM;
         AttachSESource.volume = _beforeSE;
 
@@ -180,11 +205,8 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     // Update is called once per frame
     void Update()
     {
-        if (!_isFadeOut)
-        {
-            return;
-        }
-
+        if (!_isFadeOut) return;
+        
         // 徐々にボリュームを下げていき、ボリュームが0になったらボリュームを戻し次の曲を流す
         AttachBGMSource.volume -= Time.deltaTime * _bgmFadeSpeedRate;
         if (AttachBGMSource.volume <= 0)
