@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class GraphicController : SingletonMonoBehaviour<GraphicController> {
-
+/// <summary>
+/// 画面設定の管理クラス
+/// </summary>
+public class GraphicController : SingletonMonoBehaviour<GraphicController>
+{
+    /// <summary>
+    /// 全画面にするかどうかのチェックボックス
+    /// </summary>
     [SerializeField] Toggle FullScreenToggle;
 
 

@@ -1,14 +1,46 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// オプションの管理クラス
+/// </summary>
 public class OptionController : SingletonMonoBehaviour<OptionController> {
 
+    /// <summary>
+    /// オプション画面
+    /// </summary>
+    [SerializeField]
+    private GameObject option = null;
+
+    /// <summary>
+    /// Unity Update
+    /// </summary>
     private void Update()
     {
-        // Escapeキーでオプションを閉じる
-        if(Input.GetKeyDown(KeyCode.Escape))
+        // オプションがあるなら処理
+        if(this.option != null)
         {
-            CloseOption();
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                // オプションを表示
+                if (!this.option.activeSelf)
+                    OpenOption();
+                // オプションを非表示
+                else
+                    CloseOption();
+            }
         }
+    }
+
+    /// <summary>
+    /// オプションを開く
+    /// </summary>
+    private void OpenOption()
+    {
+        // 中身がnullなら処理しない
+        if (this.option == null) return;
+
+        // オプションを表示
+        this.option.SetActive(true);
     }
 
     /// <summary>
@@ -20,10 +52,10 @@ public class OptionController : SingletonMonoBehaviour<OptionController> {
         // 変更しない場合変更前の状態にすべて戻す
 
 
-        // オプションを非表示にする
-        foreach (Transform child in this.gameObject.transform)
-        {
-            child.gameObject.SetActive(!child.gameObject.activeSelf);
-        }
+        // 中身がnullなら処理しない
+        if (this.option == null) return;
+
+        // オプションを非表示
+        this.option.SetActive(false);
     }
 }

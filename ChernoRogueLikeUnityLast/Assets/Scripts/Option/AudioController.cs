@@ -2,53 +2,79 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AudioController : SingletonMonoBehaviour<AudioController> {
+/// <summary>
+/// オーディオ管理クラス
+/// </summary>
+public class AudioController : SingletonMonoBehaviour<AudioController>
+{
 
-    //ボリューム保存用のkeyとデフォルト値
+    /// <summary>
+    /// ボリューム保存用のkeyとデフォルト値
+    /// </summary>
     private const string BGM_VOLUME_KEY = "BGM_VOLUME_KEY";
     private const string SE_VOLUME_KEY = "SE_VOLUME_KEY";
     private const float BGM_VOLUME_DEFULT = 0.6f;
     private const float SE_VOLUME_DEFULT = 0.6f;
 
-    //BGMがフェードするのにかかる時間
+    /// <summary>
+    /// BGMがフェードするのにかかる時間
+    /// </summary>
     public const float BGM_FADE_SPEED_RATE_HIGH = 0.9f;
     public const float BGM_FADE_SPEED_RATE_LOW = 0.3f;
     private float _bgmFadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH;
 
-    //BGMをフェードアウト中か
+    /// <summary>
+    /// BGMをフェードアウト中か
+    /// </summary>
     private bool _isFadeOut = false;
 
-    //次流すBGM名、SE名
-    private string _nextBGMName;
-    private string _nextSEName;
+    /// <summary>
+    /// 次流すBGM名、SE名
+    /// </summary>
+    private string _nextBGMName = "";
+    private string _nextSEName = "";
 
-    //BGM用、SE用に分けてオーディオソースを持つ
+    /// <summary>
+    /// BGM用、SE用に分けてオーディオソースを持つ
+    /// </summary>
     [SerializeField]
-    private AudioSource AttachBGMSource, AttachSESource;
+    private AudioSource AttachBGMSource, AttachSESource = null;
 
-    // 全部のAudioを所持
-    private Dictionary<string, AudioClip> _bgmDic, _seDic;
+    /// <summary>
+    /// 全部のAudioを所持
+    /// </summary>
+    private Dictionary<string, AudioClip> _bgmDic, _seDic = null;
 
-    // 変更確定用のボタン
+    /// <summary>
+    /// 変更確定用のボタン
+    /// </summary>
     [SerializeField]
-    private Button _applyButton, _cancelButton;
+    private Button _applyButton, _cancelButton = null;
 
-    // 音量変更スライダー
+    /// <summary>
+    /// 音量変更スライダー
+    /// </summary>
     [SerializeField] private Slider _BGMSlider = null;
     [SerializeField] private Slider _SESlider = null;
 
-    // デフォルトのBGMとSEの音量
+    /// <summary>
+    /// デフォルトのBGMとSEの音量
+    /// </summary>
     private float _beforeBGM = 0.0f;
     private float _beforeSE = 0.0f;
-    
-    // 音量の変更タイプ
-    public enum ChangeType
+
+    /// <summary>
+    /// 音量の変更タイプ
+    /// </summary>
+    public enum AudioChangeType
     {
         BGM,
         SE
     };
 
-    // Start関数より先に起こす処理
+    /// <summary>
+    /// Unity Awake
+    /// </summary>
     private void Awake()
     {
         if (this != Instance)
@@ -80,7 +106,9 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
         }
     }
 
-    // Use this for initialization
+    /// <summary>
+    /// Unity Start
+    /// </summary>
     void Start()
     {
         // 各ボリュームの初期化
@@ -125,6 +153,7 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
             FadeOutBGM(fadeSpeedRate);
         }
     }
+
     /// <summary>
     /// 現在流れている曲をフェードアウトさせる
     /// fadeSpeedRateに指定した割合でフェードアウトするスピードが変わる
@@ -165,15 +194,15 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
     /// </summary>
     /// <param name="volume">変更したい音量</param>
     /// <param name="changeType">BGM or SE</param>
-    public void ChangeVolume(float volume ,ChangeType changeType)
+    public void ChangeVolume(float volume ,AudioChangeType changeType)
     {
         switch(changeType)
         {
-            case ChangeType.BGM:
+            case AudioChangeType.BGM:
                 AttachBGMSource.volume = volume;
                 break;
 
-            case ChangeType.SE:
+            case AudioChangeType.SE:
                 AttachSESource.volume = volume;
                 break;
         }
@@ -202,7 +231,9 @@ public class AudioController : SingletonMonoBehaviour<AudioController> {
         _SESlider.value = _beforeSE;
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Unity Update
+    /// </summary>
     void Update()
     {
         if (!_isFadeOut) return;

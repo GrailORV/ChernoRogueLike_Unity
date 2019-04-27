@@ -1,18 +1,32 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class SystemController : SingletonMonoBehaviour<SystemController> {
+/// <summary>
+/// ゲームシステムの管理クラス
+/// </summary>
+public class SystemController : SingletonMonoBehaviour<SystemController>
+{
 
-    // ゲームの速度と文字送りの速度のkeyとデフォルト値
+    /// <summary>
+    /// ゲームの速度と文字送りの速度のkeyとデフォルト値
+    /// </summary>
     private const string GAME_SPEED_KEY = "GAME_SPEED_KEY";
     private const string MESSAGE_SPEED_KEY = "MESSAGE_SPEED_KEY";
 
     private const float GAME_SPEED_DEFULT = 0.5f;
     private const float MESSAGE_SPEED_DEFULT = 0.5f;
 
-    // スライダー
-    [SerializeField] private Slider gameSpeedSlider;
-    [SerializeField] private Slider messageSpeedSlider;
+    /// <summary>
+    /// ゲームスピードの変更スライダー
+    /// </summary>
+    [SerializeField]
+    private Slider gameSpeedSlider = null;
+
+    /// <summary>
+    /// 文字送り速度の変更スライダー
+    /// </summary>
+    [SerializeField]
+    private Slider messageSpeedSlider = null;
 
     // Use this for initialization
     void Start () {
