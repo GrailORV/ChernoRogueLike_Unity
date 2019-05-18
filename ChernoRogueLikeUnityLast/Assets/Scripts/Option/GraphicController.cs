@@ -1,13 +1,23 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using UnityEngine.UI;
 
-public class GraphicController : MonoBehaviour {
-
+/// <summary>
+/// 画面設定の管理クラス
+/// </summary>
+public class GraphicController : SingletonMonoBehaviour<GraphicController>
+{
+    /// <summary>
+    /// 全画面にするかどうかのチェックボックス
+    /// </summary>
     [SerializeField] Toggle FullScreenToggle;
 
+
+    /// <summary>
+    /// 画面の設定変更
+    /// </summary>
     public void OnClickFullScreenToggle()
     {
+        // フルスクリーンの切り替え
         Screen.fullScreen = !Screen.fullScreen;
     }
 }

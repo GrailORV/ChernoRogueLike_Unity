@@ -1,39 +1,80 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AudioController : SinglTonMonoBehaviour<AudioController> {
+/// <summary>
+/// オーディオ管理クラス
+/// </summary>
+public class AudioController : SingletonMonoBehaviour<AudioController>
+{
 
-    //ボリューム保存用のkeyとデフォルト値
+    /// <summary>
+    /// ボリューム保存用のkeyとデフォルト値
+    /// </summary>
     private const string BGM_VOLUME_KEY = "BGM_VOLUME_KEY";
     private const string SE_VOLUME_KEY = "SE_VOLUME_KEY";
     private const float BGM_VOLUME_DEFULT = 0.6f;
     private const float SE_VOLUME_DEFULT = 0.6f;
 
-    //BGMがフェードするのにかかる時間
+    /// <summary>
+    /// BGMがフェードするのにかかる時間
+    /// </summary>
     public const float BGM_FADE_SPEED_RATE_HIGH = 0.9f;
     public const float BGM_FADE_SPEED_RATE_LOW = 0.3f;
     private float _bgmFadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH;
 
-    //BGMをフェードアウト中か
+    /// <summary>
+    /// BGMをフェードアウト中か
+    /// </summary>
     private bool _isFadeOut = false;
 
-    //次流すBGM名、SE名
-    private string _nextBGMName;
-    private string _nextSEName;
+    /// <summary>
+    /// 次流すBGM名、SE名
+    /// </summary>
+    private string _nextBGMName = "";
+    private string _nextSEName = "";
 
-    //BGM用、SE用に分けてオーディオソースを持つ
+    /// <summary>
+    /// BGM用、SE用に分けてオーディオソースを持つ
+    /// </summary>
     [SerializeField]
-    private AudioSource AttachBGMSource, AttachSESource;
+    private AudioSource AttachBGMSource, AttachSESource = null;
 
-    // 全部のAudioを所持
-    private Dictionary<string, AudioClip> _bgmDic, _seDic;
+    /// <summary>
+    /// 全部のAudioを所持
+    /// </summary>
+    private Dictionary<string, AudioClip> _bgmDic, _seDic = null;
 
+    /// <summary>
+    /// 変更確定用のボタン
+    /// </summary>
     [SerializeField]
-    private Toggle _apply, _cansel;
+    private Button _applyButton, _cancelButton = null;
 
-    // Start関数より先に起こす処理
+    /// <summary>
+    /// 音量変更スライダー
+    /// </summary>
+    [SerializeField] private Slider _BGMSlider = null;
+    [SerializeField] private Slider _SESlider = null;
+
+    /// <summary>
+    /// デフォルトのBGMとSEの音量
+    /// </summary>
+    private float _beforeBGM = 0.0f;
+    private float _beforeSE = 0.0f;
+
+    /// <summary>
+    /// 音量の変更タイプ
+    /// </summary>
+    public enum AudioChangeType
+    {
+        BGM,
+        SE
+    };
+
+    /// <summary>
+    /// Unity Awake
+    /// </summary>
     private void Awake()
     {
         if (this != Instance)
@@ -65,23 +106,33 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
         }
     }
 
-    // Use this for initialization
+    /// <summary>
+    /// Unity Start
+    /// </summary>
     void Start()
     {
+        // 各ボリュームの初期化
+        _beforeBGM = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFULT);
+        _beforeSE = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFULT);
+
         // 音量をセーブされている所から値を設定
-        AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFULT);
-        AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFULT);
+        AttachBGMSource.volume = _beforeBGM;
+        AttachSESource.volume = _beforeSE;
+
+        // スライダーの値の初期化
+        _BGMSlider.value = _beforeBGM;
+        _SESlider.value = _beforeSE;
     }
 
-    //======================================================================================
-    // BGM
-    //======================================================================================
     /// <summary>
-    /// 指定したファイル名をBGMを流す。ただしすでに流れている場合は前の曲をフェードアウトさせてから。
-    /// 第二引数のfadeSpeedRateに指定した割合でフェードアウトするスピードが変わる
+    /// BGMの再生
+    /// ほかのBGMが流れている場合はフェードアウトさせてから再生
     /// </summary>
+    /// <param name="bgmName">流したいBGMの名前</param>
+    /// <param name="fadeSpeedRate">前の曲をフェードアウトさせる長さ</param>
     public void PlayBGM(string bgmName, float fadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH)
     {
+        // BGMがない場合はログを表示しスルー
         if (!_bgmDic.ContainsKey(bgmName))
         {
             Debug.LogWarning(bgmName + "という名前のBGMはありません");
@@ -102,6 +153,7 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
             FadeOutBGM(fadeSpeedRate);
         }
     }
+
     /// <summary>
     /// 現在流れている曲をフェードアウトさせる
     /// fadeSpeedRateに指定した割合でフェードアウトするスピードが変わる
@@ -112,10 +164,11 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
         _isFadeOut = true;
     }
 
-    //======================================================================================
-    // SE
-    //======================================================================================
-
+    /// <summary>
+    /// SEを再生
+    /// </summary>
+    /// <param name="seName">流したいSEの名前</param>
+    /// <param name="delay">遅らせて再生したい場合は任意の値を入力（defaultは0）</param>
     public void PlaySE(string seName, float delay = 0.0f)
     {
         if (!_seDic.ContainsKey(seName))
@@ -127,53 +180,64 @@ public class AudioController : SinglTonMonoBehaviour<AudioController> {
         Invoke("DelayPlaySE", delay);
     }
 
+    /// <summary>
+    /// 指定されたSEを再生
+    /// </summary>
     private void DelayPlaySE()
     {
         // ここでSEを鳴らす
         AttachSESource.PlayOneShot(_seDic[_nextSEName] as AudioClip);
     }
 
-
-    //======================================================================================
-    // 音量変更
-    //======================================================================================
-
-    public void ChangeBGMVolume(float BGMVolume)
+    /// <summary>
+    /// 音量調節
+    /// </summary>
+    /// <param name="volume">変更したい音量</param>
+    /// <param name="changeType">BGM or SE</param>
+    public void ChangeVolume(float volume ,AudioChangeType changeType)
     {
-        AttachBGMSource.volume = BGMVolume;
+        switch(changeType)
+        {
+            case AudioChangeType.BGM:
+                AttachBGMSource.volume = volume;
+                break;
 
-        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, BGMVolume);
+            case AudioChangeType.SE:
+                AttachSESource.volume = volume;
+                break;
+        }
     }
 
-    public void ChangeSEVolume(float SEVolume)
+    /// <summary>
+    /// Applyボタンを押すと変更が保存される
+    /// </summary>
+    public void OnClickApply()
     {
-        AttachSESource.volume = SEVolume;
-
-        PlayerPrefs.SetFloat(SE_VOLUME_KEY, SEVolume);
+        // PlayerPrefsに値を保存
+        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, AttachBGMSource.volume);
+        PlayerPrefs.SetFloat(SE_VOLUME_KEY, AttachSESource.volume);
     }
 
-    public void ChangeBGMVolumeInputField(float BGMVolume)
+    /// <summary>
+    /// Chancelボタンを押すと変更前の値に修正される
+    /// </summary>
+    public void OnClickChancel()
     {
-        AttachBGMSource.volume = BGMVolume;
+        // 実行時の値を代入
+        AttachBGMSource.volume = _beforeBGM;
+        AttachSESource.volume = _beforeSE;
 
-        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, BGMVolume);
+        _BGMSlider.value = _beforeBGM;
+        _SESlider.value = _beforeSE;
     }
 
-    public void ChangeSEVolumeInputField(float SEVolume)
-    {
-        AttachSESource.volume = SEVolume;
-
-        PlayerPrefs.SetFloat(SE_VOLUME_KEY, SEVolume);
-    }
-
-    // Update is called once per frame
+    /// <summary>
+    /// Unity Update
+    /// </summary>
     void Update()
     {
-        if (!_isFadeOut)
-        {
-            return;
-        }
-
+        if (!_isFadeOut) return;
+        
         // 徐々にボリュームを下げていき、ボリュームが0になったらボリュームを戻し次の曲を流す
         AttachBGMSource.volume -= Time.deltaTime * _bgmFadeSpeedRate;
         if (AttachBGMSource.volume <= 0)

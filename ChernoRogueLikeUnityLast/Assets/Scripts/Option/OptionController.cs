@@ -1,35 +1,61 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
-public class OptionController : SinglTonMonoBehaviour<OptionController> {
+/// <summary>
+/// オプションの管理クラス
+/// </summary>
+public class OptionController : SingletonMonoBehaviour<OptionController> {
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private void InitOption()
-    {
-        var optionController = Resources.Load("Prefabs/OptionMenu") as GameObject;
-        Instantiate(optionController);
-        GameObject.DontDestroyOnLoad(optionController);
-    }
+    /// <summary>
+    /// オプション画面
+    /// </summary>
+    [SerializeField]
+    private GameObject option = null;
 
-    //private void Awake()
-    //{
-    //    if(this != Instance)
-    //    {
-    //        Destroy(this);
-    //        return;
-    //    }
-
-    //    DontDestroyOnLoad(this.gameObject);
-    //}
-
+    /// <summary>
+    /// Unity Update
+    /// </summary>
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        // オプションがあるなら処理
+        if(this.option != null)
         {
-
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                // オプションを表示
+                if (!this.option.activeSelf)
+                    OpenOption();
+                // オプションを非表示
+                else
+                    CloseOption();
+            }
         }
+    }
+
+    /// <summary>
+    /// オプションを開く
+    /// </summary>
+    public void OpenOption()
+    {
+        // 中身がnullなら処理しない
+        if (this.option == null) return;
+
+        // オプションを表示
+        this.option.SetActive(true);
+    }
+
+    /// <summary>
+    /// オプションを閉じる
+    /// </summary>
+    public void CloseOption()
+    {
+        // 変更していて確定前だったら確認する
+        // 変更しない場合変更前の状態にすべて戻す
+
+
+        // 中身がnullなら処理しない
+        if (this.option == null) return;
+
+        // オプションを非表示
+        this.option.SetActive(false);
     }
 }
