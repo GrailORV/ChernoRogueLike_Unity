@@ -34,7 +34,7 @@ public class OptionController : SingletonMonoBehaviour<OptionController> {
     /// <summary>
     /// オプションを開く
     /// </summary>
-    private void OpenOption()
+    public void OpenOption()
     {
         // 中身がnullなら処理しない
         if (this.option == null) return;

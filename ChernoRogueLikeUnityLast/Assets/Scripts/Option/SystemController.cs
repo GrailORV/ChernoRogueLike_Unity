@@ -31,10 +31,19 @@ public class SystemController : SingletonMonoBehaviour<SystemController>
     // Use this for initialization
     void Start () {
 
+        Setup();
+
+    }
+
+    /// <summary>
+    /// 各種情報の設定
+    /// </summary>
+    private void Setup()
+    {
         // PlayerPrefsにセーブされている値を取得し、入れる(今は仮でスライダーに代入)
         gameSpeedSlider.value = PlayerPrefs.GetFloat(GAME_SPEED_KEY, GAME_SPEED_DEFULT);
         messageSpeedSlider.value = PlayerPrefs.GetFloat(MESSAGE_SPEED_KEY, MESSAGE_SPEED_DEFULT);
-	}
+    }
 
 
     /// <summary>
