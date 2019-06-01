@@ -69,7 +69,7 @@ public class SystemController : SingletonMonoBehaviour<SystemController>
     /// <summary>
     /// 変更確定
     /// </summary>
-    public void FixConfiguration()
+    public void ApplyConfiguration()
     {
         PlayerPrefs.SetFloat(GAME_SPEED_KEY, gameSpeedSlider.value);
         PlayerPrefs.SetFloat(MESSAGE_SPEED_KEY, messageSpeedSlider.value);
