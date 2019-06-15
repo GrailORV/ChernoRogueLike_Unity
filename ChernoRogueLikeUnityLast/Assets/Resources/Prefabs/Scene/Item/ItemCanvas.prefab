@@ -29,7 +29,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1043901434192740
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 224743568450728908}
   - component: {fileID: 222781963800355916}
   - component: {fileID: 114997721106285786}
+  - component: {fileID: 114924762467871812}
   m_Layer: 5
   m_Name: ItemWindow
   m_TagString: Untagged
@@ -240,8 +241,8 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 1
+  m_Spacing: 8
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -331,11 +332,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 921af31992f03e54f8fb262291aa2fbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _itemWindowObj: {fileID: 1043901434192740}
+  _itemWindowControl: {fileID: 114924762467871812}
+  _cursorPrefab: {fileID: 1559246543566102, guid: ea2446074308a78499c1698a9b1ab949,
+    type: 2}
   _contentsObj: {fileID: 1875227071226082}
   _itemBasePrefab: {fileID: 1225838873283858, guid: 922faadc199cbcf418fb450b85d8c0dd,
     type: 2}
-  _pager: {fileID: 114164476679264068}
 --- !u!114 &114766447540811636
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -404,11 +406,23 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1875227071226082}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -146154839, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114924762467871812
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1043901434192740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92242b3c4f9fdfe44a40a33080cd9b21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pager: {fileID: 114164476679264068}
 --- !u!114 &114997721106285786
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -504,9 +518,9 @@ RectTransform:
   m_Father: {fileID: 224188321089461996}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 25, y: -25}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224188321089461996
@@ -526,7 +540,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 440}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224377737360756330
 RectTransform:
