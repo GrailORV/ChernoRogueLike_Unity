@@ -5,38 +5,34 @@ using UnityEngine;
 /// <summary>
 /// セーブデータの管理クラス
 /// </summary>
-public class SaveManager : SingletonMonoBehaviour<SaveManager>
+public class SaveManager : SaveData
 {
-    /// <summary>
-    /// セーブデータ
-    /// </summary>
-    public class SaveData
-    {
-        public int playerLavel = 0;     // プレイヤーレベル
-        public string name = "";        // 名前
-        public List<int> ItemDatas = new List<int>();   // 所持アイテムのリスト
-    }
-
-    private SaveData saveDatas = new SaveData();
-
-    [HideInInspector]
-    public string playerSavePath = "SaveData/PlayerData";
-
     /// <summary>
     /// データをJsonに変換して書き込み
     /// </summary>
     /// <param name="filePath">保存先のパス</param>
     /// <param name="saveData">セーブしたいデータ</param>
-    public void Save(string filePath,SaveData saveData)
+    public static void Save(string filePath, SaveData saveData, SaveDataList.SaveDataType type)
     {
-        var path = Resources.Load(playerSavePath);
+        // セーブデータを取得
+        var path = Resources.Load(playerSaveData);
+        // パスが取得できなかったもしくは保存したいデータがないなら中止
+        if (path == null || saveData == null) return;
 
-        FileStream fs = new FileStream(path.ToString(), FileMode.Create, FileAccess.Write);
-        StreamWriter sw = new StreamWriter(fs);
+        switch (type)
+        {
+            // プレイヤーデータ（レベルや名前など）
+            case SaveDataList.SaveDataType.PlayerData:
+                FileStream fs = new FileStream(path.ToString(), FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs);
+                sw.WriteLine(JsonUtility.ToJson(saveData));
+                sw.Flush();
+                sw.Close();
+                break;
 
-        var newSaveData = saveData;
-
-        sw.WriteLine(JsonUtility.ToJson(newSaveData));
+            case SaveDataList.SaveDataType.ItemData:
+                break;
+        }
     }
 
     /// <summary>
@@ -44,12 +40,12 @@ public class SaveManager : SingletonMonoBehaviour<SaveManager>
     /// </summary>
     /// <param name="filePath">読み込みたいファイルのパス</param>
     /// <returns></returns>
-    public SaveData Load(string filePath)
+    public static SaveData Load(string filePath)
     {
-        var path = Resources.Load(playerSavePath);
+        var path = Resources.Load(playerSaveData);
 
         // セーブデータのファイルがない
-        if (!File.Exists(path.ToString()))
+        if (path == null)
         {
             Debug.Log("セーブデータがありません");
             return null;
@@ -66,29 +62,5 @@ public class SaveManager : SingletonMonoBehaviour<SaveManager>
         if (saveData == null) return null;
 
         return saveData;
-    }
-
-    /// <summary>
-    /// Unity Updata
-    /// </summary>
-    private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            saveDatas.name = "omnk";
-            saveDatas.playerLavel = 10;
-        }
-    }
-
-
-    public void LoadButton()
-    {
-        Load(playerSavePath);
-    }
-
-
-    public void SaveButton()
-    {
-        Save(playerSavePath, saveDatas);
     }
 }

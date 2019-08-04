@@ -2,15 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveData : MonoBehaviour {
+/// <summary>
+/// セーブデータの基底クラス
+/// </summary>
+public class SaveData
+{
+    /// <summary>
+    /// セーブデータの保存先パス
+    /// </summary>
+    public const string playerSaveData = "";
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    /// <summary>
+    /// プレイヤーのレベル情報
+    /// </summary>
+    public static int playerLavel = 0;
+    /// <summary>
+    /// 名前
+    /// </summary>
+    public static string name = "";
+
 }
