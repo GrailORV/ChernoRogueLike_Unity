@@ -32,7 +32,16 @@ public class ItemDataControl: MonoBehaviour
     /// </summary>
     public void SetUIContents(ItemData data)
     {
+        if(data == null)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
+
         // TODO まだ名前のみ
         _nameText.text = data.Name;
+
+        // 表示
+        gameObject.SetActive(true);
     }
 }
