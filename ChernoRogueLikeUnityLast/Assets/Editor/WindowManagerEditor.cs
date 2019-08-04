@@ -136,7 +136,7 @@ public class WindowManagerEditor : MonoBehaviour
 
         // Dictionaryのpath一覧を作成
         // key = 名前 value = パス
-        builder.AppendLine("\tpublic readonly static Dictionary<int, string> windowPathDict = new Dictionary<int, string>()");
+        builder.AppendLine("\tpublic readonly static Dictionary<int, string> _windowPathDict = new Dictionary<int, string>()");
         builder.AppendLine("\t{");
         int count = 0;
         foreach (var data in dict)
