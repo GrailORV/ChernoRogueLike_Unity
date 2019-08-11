@@ -22,6 +22,8 @@ public class WindowBase : MonoBehaviour
     // アニメーションの種類(デフォルトは拡縮)
     [SerializeField] AnimationBuilder.TweenType _tweenType = AnimationBuilder.TweenType.zoom;
 
+    // 削除時に呼ばれるコールバック
+    public System.Action OnDestroyAction = null;
 
     // RectTransform
     protected RectTransform _rectTransform;
@@ -123,5 +125,16 @@ public class WindowBase : MonoBehaviour
             IsClose = true;
             gameObject.SetActive(false);
         });
+    }
+
+    /// <summary>
+    /// 削除時
+    /// </summary>
+    void OnDestroy()
+    {
+        if(OnDestroyAction != null)
+        {
+            OnDestroyAction.Invoke();
+        }
     }
 }

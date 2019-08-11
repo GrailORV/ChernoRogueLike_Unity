@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class SampleController : MonoBehaviour
 {
-    [SerializeField] SampleWindow _sampleWindow;
+    SampleWindow _sampleWindow;
+
+    private void Start()
+    {
+        _sampleWindow = WindowManager.Instance.CreateWindow<SampleWindow>(WindowData.WindowType.SampleWindowPanel);
+    }
 
     private void Update()
     {
