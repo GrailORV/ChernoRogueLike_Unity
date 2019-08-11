@@ -10,8 +10,8 @@ public static class WindowData
 		SampleWindowPanel,
 	}
 
-	public readonly static Dictionary<int, string> windowPathDict = new Dictionary<int, string>()
+	public readonly static Dictionary<WindowType, string> WindowPathDict = new Dictionary<WindowType, string>()
 	{
-		{ 0 , "Prefabs/Scene/SampleWindowManager/SampleWindow(Panel)" },
+		{ WindowType.SampleWindowPanel , "Prefabs/Scene/SampleWindowManager/SampleWindow(Panel)" },
 	};
 }
