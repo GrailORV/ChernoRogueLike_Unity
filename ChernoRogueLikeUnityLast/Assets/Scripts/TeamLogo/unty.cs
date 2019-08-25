@@ -7,16 +7,12 @@ using UnityEngine.SceneManagement;
 public class unty : MonoBehaviour {
 
     [SerializeField] GameObject Logo;
-    [SerializeField] float fadeTime, IntercalTime;
+    [SerializeField] float fadeTime = 0.0f;
+    [SerializeField] float intercalTime = 0.0f;
 
 	// Use this for initialization
 	void Start () {
         LogoFade();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
     public void LogoFade()
@@ -24,7 +20,7 @@ public class unty : MonoBehaviour {
         Sequence seq = DOTween.Sequence();
 
         seq.Append(Logo.GetComponent<CanvasGroup>().DOFade(1f, fadeTime))
-            .AppendInterval(IntercalTime)
+            .AppendInterval(intercalTime)
             .Append(Logo.GetComponent<CanvasGroup>().DOFade(0f, fadeTime))
             .OnComplete(() =>
             {
