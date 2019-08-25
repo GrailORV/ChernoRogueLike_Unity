@@ -5,7 +5,6 @@ namespace WindowAnimation
 {
     public interface ITweenAnimation
     {
-        bool  IsAnimation   { get; }
         float AnimationTime { set; get; }
         float DelayTime     { set; get; }
 

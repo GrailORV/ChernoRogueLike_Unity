@@ -34,6 +34,9 @@ public class WindowBase : MonoBehaviour
     // 画面が閉じているかどうか
     bool _isClose = true;
 
+    // 表示・非表示のアニメーション中かどうか
+    bool _isTweenAnimation = false;
+
     /// <summary>
     /// レクトトランスフォーム
     /// </summary>
@@ -75,6 +78,15 @@ public class WindowBase : MonoBehaviour
         get { return _isClose; }
     }
 
+    /// <summary>
+    /// 表示・非表示のアニメーション中かどうか
+    /// </summary>
+    public bool IsTweenAnimation
+    {
+        private set { _isTweenAnimation = value; }
+        get { return _isTweenAnimation; }
+    }
+
     protected virtual void Awake()
     {
         // 初期は非表示
@@ -100,14 +112,21 @@ public class WindowBase : MonoBehaviour
     /// </summary>
 	public virtual void Open()
     { 
-        if(!IsClose || TweenAnimation.IsAnimation)
+        if(!IsClose || IsTweenAnimation)
         {
             return;
         }
 
         IsClose = false;
+        IsTweenAnimation = true;
         gameObject.SetActive(true);
-        TweenAnimation.Open(null);
+
+        // アニメーション
+        TweenAnimation.Open(() =>
+        {
+            // 終了時にフラグを戻す
+            IsTweenAnimation = false;
+        });
     }
 
     /// <summary>
@@ -115,13 +134,19 @@ public class WindowBase : MonoBehaviour
     /// </summary>
     public virtual void Close()
     {
-        if (IsClose || TweenAnimation.IsAnimation)
+        if (IsClose || IsTweenAnimation)
         {
             return;
         }
 
+        IsTweenAnimation = true;
+
+        // アニメーション
         TweenAnimation.Close(() =>
         {
+            // 終了時にフラグを戻す
+            IsTweenAnimation = false;
+
             IsClose = true;
             gameObject.SetActive(false);
         });

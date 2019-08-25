@@ -7,9 +7,6 @@ namespace WindowAnimation
 {
     public class TweenAnimationZoomVertical : ITweenAnimation
     {
-        /// <summary>アニメーション中かどうか<summary>
-        public bool IsAnimation { private set; get; }
-
         /// <summary>アニメーションの時間</summary>
         public float AnimationTime { set; get; }
 
@@ -47,12 +44,10 @@ namespace WindowAnimation
             // 拡大アニメーションを行う
             var tween = _rectT.DOScale(_defaultScale, AnimationTime);
             tween.SetDelay(DelayTime);
-            tween.OnStart(() => { IsAnimation = true; });
 
             // コールバックの設定
             tween.OnComplete(() =>
             {
-                IsAnimation = false;
                 if (onComplete != null)
                 {
                     onComplete();
@@ -71,12 +66,10 @@ namespace WindowAnimation
             // 縮小アニメーションを行う
             var tween = _rectT.DOScale(new Vector2(1f, 0f), AnimationTime);
             tween.SetDelay(DelayTime);
-            tween.OnStart(() => { IsAnimation = true; });
 
             // コールバックの設定
             tween.OnComplete(() =>
             {
-                IsAnimation = false;
                 if (onComplete != null)
                 {
                     onComplete();
