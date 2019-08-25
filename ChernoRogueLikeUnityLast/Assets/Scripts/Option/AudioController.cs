@@ -29,16 +29,26 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     private bool _isFadeOut = false;
 
     /// <summary>
-    /// 次流すBGM名、SE名
+    /// 次流すBGM名
     /// </summary>
     private string _nextBGMName = "";
+
+    /// <summary>
+    /// 次流すSE名
+    /// </summary>
     private string _nextSEName = "";
 
     /// <summary>
-    /// BGM用、SE用に分けてオーディオソースを持つ
+    /// BGM用オーディオソース
     /// </summary>
     [SerializeField]
-    private AudioSource AttachBGMSource, AttachSESource = null;
+    private AudioSource AttachBGMSource = null;
+
+    /// <summary>
+    /// SE用オーディオソース
+    /// </summary>
+    [SerializeField]
+    private AudioSource AttachSESource = null;
 
     /// <summary>
     /// 全部のAudioを所持
@@ -58,9 +68,13 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     [SerializeField] private Slider _SESlider = null;
 
     /// <summary>
-    /// デフォルトのBGMとSEの音量
+    /// デフォルトのBGMボリューム
     /// </summary>
     private float _beforeBGM = 0.0f;
+
+    /// <summary>
+    /// デフォルトのSEボリューム
+    /// </summary>
     private float _beforeSE = 0.0f;
 
     /// <summary>
@@ -75,16 +89,10 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     /// <summary>
     /// Unity Awake
     /// </summary>
-    private void Awake()
+    override protected void Awake()
     {
-        if (this != Instance)
-        {
-            Destroy(this);
-            return;
-        }
-
-        // シーンを移動してもこのゲームオブジェクトは消えないように
-        DontDestroyOnLoad(gameObject);
+        base.Awake();
+        DontDestroyOnLoad(this.gameObject);
 
         // リソースフォルダにある「BGM」「SE」のファイルを全部読み込む
         _bgmDic = new Dictionary<string, AudioClip>();
