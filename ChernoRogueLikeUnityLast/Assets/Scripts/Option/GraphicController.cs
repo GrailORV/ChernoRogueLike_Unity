@@ -13,6 +13,14 @@ public class GraphicController : SingletonMonoBehaviour<GraphicController>
 
 
     /// <summary>
+    /// Unity Awake
+    /// </summary>
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+    /// <summary>
     /// 画面の設定変更
     /// </summary>
     public void OnClickFullScreenToggle()

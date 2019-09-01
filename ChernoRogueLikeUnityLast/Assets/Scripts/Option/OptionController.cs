@@ -11,6 +11,15 @@ public class OptionController : SingletonMonoBehaviour<OptionController> {
     [SerializeField]
     private GameObject option = null;
 
+
+    /// <summary>
+    /// Unity Awake
+    /// </summary>
+    override protected void Awake()
+    {
+        base.Awake();
+    }
+
     /// <summary>
     /// Unity Update
     /// </summary>
