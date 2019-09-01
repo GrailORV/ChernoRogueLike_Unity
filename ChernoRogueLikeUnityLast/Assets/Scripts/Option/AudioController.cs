@@ -92,7 +92,6 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     override protected void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(this.gameObject);
 
         // リソースフォルダにある「BGM」「SE」のファイルを全部読み込む
         _bgmDic = new Dictionary<string, AudioClip>();
