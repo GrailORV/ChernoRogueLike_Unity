@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class ItemDataControl: MonoBehaviour
+public class ItemCell: MonoBehaviour
 {
     // レクとトランスフォーム
     [SerializeField] RectTransform _rectTransform = null;
