@@ -815,7 +815,7 @@ public class InputControllerManager
             int down = 0;
             for (var i = 0; i < _controllerList.Count; i++)
             {
-                down = down += _controllerList[i].GetAxisDown(axis);
+                down += _controllerList[i].GetAxisDown(axis);
             }
 
             if(Mathf.Abs(down) > 1)
@@ -850,7 +850,7 @@ public class InputControllerManager
             int down = 0;
             for (var i = 0; i < _controllerList.Count; i++)
             {
-                down = down += _controllerList[i].GetAnyAxisDown(isHorizontal);
+                down += _controllerList[i].GetAnyAxisDown(isHorizontal);
             }
 
             if (Mathf.Abs(down) > 1)
