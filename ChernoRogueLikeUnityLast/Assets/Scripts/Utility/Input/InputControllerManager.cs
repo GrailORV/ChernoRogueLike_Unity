@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System;
 using UnityEngine;
 
 using InputController;
@@ -11,6 +13,28 @@ public class InputControllerManager
     {
         One, Two, Three, Four, Max, None
     }
+
+    public struct InputBuffer
+    {
+        public Controller.Button button;
+        public int count;
+        public Action action;
+
+        public InputBuffer(Controller.Button button, int count, Action action)
+        {
+            this.button = button;
+            this.count = count;
+            this.action = action;
+        }
+
+        public void Delete()
+        {
+            this.action = null;
+        }
+    }
+
+    // 一時保存の入力情報を保存しておくフレーム数
+    static readonly int BUFFER_HOLD_FRAME = 3;
 
     /// <summary>
     /// GamePadのひな形
@@ -37,6 +61,9 @@ public class InputControllerManager
     // コントローラーのボタン用リスト
     List<Dictionary<Controller.Button, int>> _gamePadList = null;
 
+    // 入力の一時保存用(バッファー)
+    List<InputBuffer> _inputBuffList = new List<InputBuffer>();
+
     // 最後に更新したフレーム
     int _lastUpdateFrame = -1;
 
@@ -55,30 +82,52 @@ public class InputControllerManager
         var controller = new Controller();
 
         // □
-        controller.ButtonDict[Controller.Button.Button_0].AddKeyName("Fire1");
+        controller.ButtonDict[Controller.Button.Button_0].AddKeyName("Square");
 
         // ×
-        controller.ButtonDict[Controller.Button.Button_1].AddKeyName("Jump");
+        controller.ButtonDict[Controller.Button.Button_1].AddKeyName("Cross");
 
         // 〇
-        controller.ButtonDict[Controller.Button.Button_2].AddKeyName("Fire2");
+        controller.ButtonDict[Controller.Button.Button_2].AddKeyName("Circle");
 
         // △
-        controller.ButtonDict[Controller.Button.Button_3].AddKeyName("Fire3");
+        controller.ButtonDict[Controller.Button.Button_3].AddKeyName("Triangle");
+
+        // L1
+        controller.ButtonDict[Controller.Button.Button_4].AddKeyName("Left1");
+
+        // R1
+        controller.ButtonDict[Controller.Button.Button_5].AddKeyName("Right1");
+
+        // L2
+        controller.ButtonDict[Controller.Button.Button_6].AddKeyName("Left2");
+
+        // R2
+        controller.ButtonDict[Controller.Button.Button_7].AddKeyName("Right2");
 
         // share
-        controller.ButtonDict[Controller.Button.Button_8].AddKeyName("Cancel");
+        controller.ButtonDict[Controller.Button.Button_8].AddKeyName("Share");
 
         // Option
-        controller.ButtonDict[Controller.Button.Button_9].AddKeyName("Submit");
+        controller.ButtonDict[Controller.Button.Button_9].AddKeyName("Option");
+
+        // L3
+        controller.ButtonDict[Controller.Button.Button_10].AddKeyName("Left3");
+
+        // R3
+        controller.ButtonDict[Controller.Button.Button_11].AddKeyName("Right3");
 
         // Lスティック
-        controller.AxisDict[Controller.Axis.L_Horizontal].AddKeyName("Horizontal");
-        controller.AxisDict[Controller.Axis.L_Vertical].AddKeyName("Vertical");
+        controller.AxisDict[Controller.Axis.L_Horizontal].AddKeyName("LeftHorizontal");
+        controller.AxisDict[Controller.Axis.L_Vertical].AddKeyName("LeftVertical");
+
+        // Rスティック
+        controller.AxisDict[Controller.Axis.R_Horizontal].AddKeyName("RightHorizontal");
+        controller.AxisDict[Controller.Axis.R_Vertical].AddKeyName("RightVertical");
 
         // 十字キー
-        controller.AxisDict[Controller.Axis.Cross_Horizontal].AddKeyName("Horizontal");
-        controller.AxisDict[Controller.Axis.Cross_Vertical].AddKeyName("Vertical");
+        controller.AxisDict[Controller.Axis.Cross_Horizontal].AddKeyName("CrossHorizontal");
+        controller.AxisDict[Controller.Axis.Cross_Vertical].AddKeyName("CrossVertical");
 
         // コントローラーを追加する
         AddController(controller);
@@ -416,6 +465,9 @@ public class InputControllerManager
         {
             _controllerList[i].Update();
         }
+
+        // バッファーの更新
+        UpdateInutBuffer();
     }
 
     #region Button関数
@@ -426,7 +478,7 @@ public class InputControllerManager
     /// <param name="button"></param>
     /// <param name="pad"></param>
     /// <returns></returns>
-    public bool GetButtonDown(Controller.Button button, GamePad pad = GamePad.One)
+    public bool GetButtonDown(Controller.Button button, GamePad pad = GamePad.One, Action action = null)
     {
         if(pad == GamePad.None)
         {
@@ -441,12 +493,27 @@ public class InputControllerManager
             {
                 down = down || controller.GetButtonDown(button);
             }
+
+            // 入力情報をバッファリング
+            if(down)
+            {
+                AddBuffer(button, action: action);
+            }
+
             return down;
         }
         // 指定のコントローラーを調べる
         else
         {
-            return _controllerList[(int)pad].GetButtonDown(button);
+            bool down = _controllerList[(int)pad].GetButtonDown(button); ;
+
+            // 入力情報をバッファリング
+            if (down)
+            {
+                AddBuffer(button, action: action);
+            }
+
+            return down;
         }
     }
 
@@ -649,6 +716,80 @@ public class InputControllerManager
         else
         {
             return 0;
+        }
+    }
+
+    /// <summary>
+    /// ボタン同時押し処理
+    /// </summary>
+    /// <param name="buttons"></param>
+    /// <param name="pad"></param>
+    /// <returns></returns>
+    public bool GetSameButtonDown(List<Controller.Button> buttons, GamePad pad = GamePad.One, Action action = null)
+    {
+        if (pad == GamePad.None)
+        {
+            return false;
+        }
+
+        // 全部のコントローラーを調べる
+        if (pad == GamePad.Max)
+        {
+            bool stay = false;
+            for (int i = 0; i < _controllerList.Count; i++)
+            {
+                if((GamePad)i >= GamePad.Max)
+                {
+                    break;
+                }
+
+                if(!GetAnyButtonDown((GamePad)i))
+                {
+                    return false;
+                }
+
+                bool down = true;
+                foreach (var button in buttons)
+                {
+                    down = down && (GetButtonDown(button, (GamePad)i, action) || _inputBuffList.Any(buff => buff.button == button));
+                }
+                stay = stay || down;
+
+                // バッファを削除
+                if (down)
+                {
+                    foreach (var button in buttons)
+                    {
+                        RemoveBuffer(button);
+                    }
+                }
+            }
+
+            return stay;
+        }
+        // 指定のコントローラーを調べる
+        else
+        {
+            if (!GetAnyButtonDown())
+            {
+                return false;
+            }
+
+            bool down = true;
+            foreach (var button in buttons)
+            {
+                down = (GetButtonDown(button, pad, action) || _inputBuffList.Any(buff => buff.button == button)) && down ;
+            }
+
+            // バッファを削除
+            if (down)
+            {
+                foreach (var button in buttons)
+                {
+                    RemoveBuffer(button);
+                }
+            }
+            return down;
         }
     }
     #endregion
@@ -997,6 +1138,82 @@ public class InputControllerManager
         }
         else
             return 0;
+    }
+    #endregion
+
+    #region バッファ
+
+    /// <summary>
+    /// バッファリストに入力情報を追加
+    /// </summary>
+    /// <param name="button"></param>
+    void AddBuffer(Controller.Button button, int count = 0, Action action = null)
+    {
+        // 同一フレーム内に入力したボタンと同じものがある場合は追加しない
+        if (_inputBuffList.Any(buff => buff.button == button && buff.count == count))
+        {
+            return;
+        }
+
+        _inputBuffList.Add(new InputBuffer(button, count, action));
+    }
+
+    /// <summary>
+    /// バッファリストに指定のものを削除
+    /// </summary>
+    /// <param name="button"></param>
+    /// <param name="count"></param>
+    void RemoveBuffer(Controller.Button button, int count = -1)
+    {
+        // カウントに指定があればそれを削除
+        if(count >= 0)
+        {
+            var buffer = _inputBuffList.FirstOrDefault(buff => buff.button == button && buff.count == count);
+            buffer.Delete();
+            _inputBuffList.Remove(buffer);
+        }
+
+        // 特に指定されていなければ古いものから削除
+        for (int i = BUFFER_HOLD_FRAME - 1; i >= 0; i--)
+        {
+            var buffer = _inputBuffList.FirstOrDefault(buff => buff.button == button && buff.count == i);
+            buffer.Delete();
+            var result = _inputBuffList.Remove(buffer);
+
+            if(result)
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// バッファリストの更新
+    /// </summary>
+    /// <param name="buff"></param>
+    void UpdateInutBuffer()
+    {
+        if (_inputBuffList.Count > 0)
+        {
+            for (int i = _inputBuffList.Count - 1; i >= 0; i--)
+            {
+                var buff = _inputBuffList[i];
+                buff.count++;
+                _inputBuffList[i] = buff;
+
+                if (_inputBuffList[i].count > BUFFER_HOLD_FRAME)
+                {
+                    Debug.Log("バッファ削除 button = " + _inputBuffList[i].button);
+                    if(_inputBuffList[i].action != null)
+                    {
+                        _inputBuffList[i].action.Invoke();
+                        _inputBuffList[i].Delete();
+                    }
+
+                    _inputBuffList.Remove(_inputBuffList[i]);
+                }
+            }
+        }
     }
     #endregion
 }
