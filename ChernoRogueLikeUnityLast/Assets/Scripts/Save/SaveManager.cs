@@ -5,61 +5,37 @@ using UnityEngine;
 /// <summary>
 /// セーブデータの管理クラス
 /// </summary>
-public class SaveManager : SaveData
+public class SaveManager : SaveDataBase
 {
     /// <summary>
-    /// データをJsonに変換して書き込み
+    /// データをJsonに変換、暗号化して書き込み
     /// </summary>
-    /// <param name="filePath">保存先のパス</param>
-    /// <param name="saveData">セーブしたいデータ</param>
-    public static void Save(string filePath, SaveData saveData, SaveDataList.SaveDataType type)
+    public static void Save()
     {
-        // セーブデータを取得
-        var path = Resources.Load(playerSaveData);
-        // パスが取得できなかったもしくは保存したいデータがないなら中止
-        if (path == null || saveData == null) return;
-
-        switch (type)
-        {
-            // プレイヤーデータ（レベルや名前など）
-            case SaveDataList.SaveDataType.PlayerData:
-                FileStream fs = new FileStream(path.ToString(), FileMode.Create, FileAccess.Write);
-                StreamWriter sw = new StreamWriter(fs);
-                sw.WriteLine(JsonUtility.ToJson(saveData));
-                sw.Flush();
-                sw.Close();
-                break;
-
-            case SaveDataList.SaveDataType.ItemData:
-                break;
-        }
+        SaveData saveData = new SaveData();
+        var json = JsonUtility.ToJson(saveData);
+        json = Encryption.EncryptString(json);
+        File.WriteAllText(Application.persistentDataPath + "/" + playerSaveData, json);
     }
 
     /// <summary>
-    /// データロード
+    /// 読み込んで複合化
     /// </summary>
     /// <param name="filePath">読み込みたいファイルのパス</param>
     /// <returns></returns>
-    public static SaveData Load(string filePath)
+    public static SaveData Load()
     {
-        var path = Resources.Load(playerSaveData);
-
-        // セーブデータのファイルがない
-        if (path == null)
-        {
-            Debug.Log("セーブデータがありません");
-            return null;
-        }
-
-        // ファイルを開く
-        FileStream fs = new FileStream(path.ToString(), FileMode.Open, FileAccess.Read);
-        StreamReader sr = new StreamReader(fs);
-
-        // セーブデータを取得
-        SaveData saveData = JsonUtility.FromJson<SaveData>(sr.ReadToEnd());
+        var data = File.ReadAllText(Application.persistentDataPath + "/" + playerSaveData);
+        data = Encryption.DecryptString(data);
+        Debug.Log(data);
+        var saveData = JsonUtility.FromJson<SaveData>(data);
 
         // 中身が空ならnullを返す
-        if (saveData == null) return null;
+        // TODO : 将来的にはnullではなくエラーメッセージを返したい
+        if (saveData == null)
+        {
+            return null;
+        }
 
         return saveData;
     }

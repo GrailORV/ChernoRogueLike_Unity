@@ -1,26 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SaveTest : MonoBehaviour
 {
     /// <summary>
-    /// セーブボタン
+    /// 読み込みデータ
     /// </summary>
     [SerializeField]
-    private GameObject saveButton = null;
+    private Text text = null;
+
     /// <summary>
-    /// ロードボタン
+    /// 保存したいデータ
     /// </summary>
     [SerializeField]
-    private GameObject loadButton = null;
+    private InputField inputFirld = null;
+
+    /// <summary>
+    /// 保存データ
+    /// </summary>
+    private SaveDataBase.SaveData saveData = null;
+
+    private void Awake()
+    {
+        this.saveData = new SaveDataBase.SaveData();
+    }
 
     /// <summary>
     /// セーブボタンイベント
     /// </summary>
     public void OnClickSaveButton()
     {
-        SaveManager.Save(SaveData.playerSaveData, null, SaveDataTypeData.SaveDataType.PlayerData);
+        this.saveDataEncode();
+        SaveManager.Save();
     }
 
     /// <summary>
@@ -28,18 +41,29 @@ public class SaveTest : MonoBehaviour
     /// </summary>
     public void OnClickLoadButton()
     {
-        SaveManager.Load(SaveData.playerSaveData);
+        var data = SaveManager.Load();
+        if (data == null)
+        {
+            Debug.Log(data);
+            return;
+        }
+        Debug.Log("データ読み込み成功");
+        Debug.Log(data.playerName);
+        Debug.Log(data.playerLevel);
     }
 
-    /// <summary>
-    /// Unity Update
-    /// </summary>
-    private void Update()
+    private void saveDataEncode()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        this.saveData.playerName = this.inputFirld.text;
+    }
+
+    public void changeInputText()
+    {
+        if(this.inputFirld.text == "")
         {
-            SaveData.name = "omnk";
-            SaveData.playerLavel = 1919;
+            this.text.text = "入力してください";
+            return;
         }
+        this.text.text = this.inputFirld.text;
     }
 }

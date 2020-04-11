@@ -56,12 +56,6 @@ public class AudioController : SingletonMonoBehaviour<AudioController>
     private Dictionary<string, AudioClip> _bgmDic, _seDic = null;
 
     /// <summary>
-    /// 変更確定用のボタン
-    /// </summary>
-    [SerializeField]
-    private Button _applyButton, _cancelButton = null;
-
-    /// <summary>
     /// 音量変更スライダー
     /// </summary>
     [SerializeField] private Slider _BGMSlider = null;

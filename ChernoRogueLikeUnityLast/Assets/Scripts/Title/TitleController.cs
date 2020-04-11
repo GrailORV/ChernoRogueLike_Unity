@@ -75,17 +75,18 @@ namespace TITLE
         /// </summary>
         void Start()
         {
-            var seq = DOTween.Sequence()
-                // タイトルロゴを移動先オブジェクトのposまで移動
-                .Append(titleLogo[0].transform.DOMove(logoPos[0].position, logoMoveTime[0]))
-                .Append(titleLogo[1].transform.DOMove(logoPos[1].position, logoMoveTime[1]))
-                .Append(titleLogo[2].transform.DOMove(logoPos[2].position, logoMoveTime[2]))
-                .AppendInterval(logoWaitTime)
-                .Append(titleLogoParent.transform.DOLocalMoveY(titleLogoPosY, titleLogoMoveTime))
-                .OnComplete(() =>
-                {
-                    selectPanel.GetComponent<CanvasGroup>().DOFade(1f, selectFadeTime);
-                });
+            var seq = DOTween.Sequence();
+
+            // タイトルロゴを移動先オブジェクトのposまで移動
+            seq.Append(titleLogo[0].transform.DOMove(logoPos[0].position, logoMoveTime[0]))
+            .Append(titleLogo[1].transform.DOMove(logoPos[1].position, logoMoveTime[1]))
+            .Append(titleLogo[2].transform.DOMove(logoPos[2].position, logoMoveTime[2]))
+            .AppendInterval(logoWaitTime)
+            .Append(titleLogoParent.transform.DOLocalMoveY(titleLogoPosY, titleLogoMoveTime))
+            .OnComplete(() =>
+            {
+                selectPanel.GetComponent<CanvasGroup>().DOFade(1f, selectFadeTime);
+            });
         }
     }
 
