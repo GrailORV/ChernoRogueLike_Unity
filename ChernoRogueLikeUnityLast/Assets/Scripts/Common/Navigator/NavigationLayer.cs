@@ -13,7 +13,7 @@ public class NavigationLayer : MonoBehaviour
     [Serializable]
     public class KeyCommand
     {
-        public NavigationManager.InputType type;
+        public NavigationManager.InputType type = NavigationManager.InputType.Down;
         public NavigationManager.InputKey key;
         public List<NavigationManager.InputKey> keys;
         public GameObject target;
