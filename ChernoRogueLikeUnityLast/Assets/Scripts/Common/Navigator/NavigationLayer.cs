@@ -76,7 +76,7 @@ public class NavigationLayer : MonoBehaviour
             }
             if (_currentNavigator != null)
             {
-                old.OnHover(true);
+                _currentNavigator.OnHover(true);
             }
 
             // defaultIndexの更新
