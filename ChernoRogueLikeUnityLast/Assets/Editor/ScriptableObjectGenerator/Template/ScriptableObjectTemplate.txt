@@ -1,0 +1,15 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class $CLASS_NAME$ : ScriptableObject
+{
+    /// <summary> データリスト </summary>
+    public List<Data> dataList = new List<Data>();
+
+    [System.Serializable]
+    public class Data
+    {
+$DATA_VALUE$
+    }
+}
