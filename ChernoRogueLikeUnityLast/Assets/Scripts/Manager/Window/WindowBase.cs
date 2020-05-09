@@ -14,6 +14,7 @@ using WindowAnimation;
 public class WindowBase : MonoBehaviour
 {
     // アニメーション時間
+    [Header("アニメーション")]
     [SerializeField] float _animPlayTime  = 0.3f;
 
     // アニメーション開始の遅延時間
@@ -21,6 +22,10 @@ public class WindowBase : MonoBehaviour
 
     // アニメーションの種類(デフォルトは拡縮)
     [SerializeField] AnimationBuilder.TweenType _tweenType = AnimationBuilder.TweenType.zoom;
+
+    // ナビゲーションレイヤー
+    [Header("ナビゲーションレイヤー")]
+    public NavigationLayer navigationLayer;
 
     // 削除時に呼ばれるコールバック
     public System.Action OnDestroyAction = null;
@@ -98,6 +103,11 @@ public class WindowBase : MonoBehaviour
     /// </summary>
     public virtual void OnEnable()
     {
+        // ナビゲーションの設定
+        if (navigationLayer != null)
+        {
+            NavigationManager.Instance.PushLayer(navigationLayer);
+        }
     }
 
     /// <summary>
@@ -105,6 +115,11 @@ public class WindowBase : MonoBehaviour
     /// </summary>
     public virtual void OnDisable()
     {
+        // ナビゲーションレイヤーの解除
+        if (navigationLayer != null)
+        {
+            NavigationManager.Instance.RemoveLayer(navigationLayer);
+        }
     }
 
     /// <summary>
