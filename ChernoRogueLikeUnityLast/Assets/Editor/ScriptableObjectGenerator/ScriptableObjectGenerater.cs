@@ -16,10 +16,10 @@ using System.Text;
 public class ScriptableObjectGenerater : EditorWindow
 {
     // 実際に使用するScriptableObjectの生成場所
-    readonly string MASTERDATA_PATH_FORMAT = "Assets/MasterData/{0}.asset";
+    readonly string MASTERDATA_PATH_FORMAT = "Assets/Resources/MasterData/{0}.asset";
 
     // データクラス・管理クラスのファイルパス
-    readonly string DATAFILE_PATH_FORMAT = "Assets/Editor/ScriptableObjectGenerator/DataCS/{0}Data.cs";
+    readonly string DATAFILE_PATH_FORMAT = "Assets/Scripts/ScriptableObjectGenerator/DataCS/{0}Data.cs";
     readonly string OPERATOR_PATH_FORMAT = "Assets/Editor/ScriptableObjectGenerator/CsvOperator/{0}Operator.cs";
 
     // テンプレート用テキストファイルのパス
