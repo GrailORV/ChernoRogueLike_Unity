@@ -4,22 +4,31 @@ using UnityEngine;
 
 public class InventoryWindow : WindowBase
 {
+    [Space(20)]
+
     // ページ数
-    readonly int MAX_PAGE = 4;
+    const int MAX_PAGE = 4;
+
+    // 表示するアイテム数
+    const int SHOW_ITEM_NUM = 10;
 
     // 総アイテム所持数
-    readonly int MAX_ITEM = 40;
-
-    [Space(20)]
+    const int MAX_ITEM = MAX_PAGE * SHOW_ITEM_NUM;
 
     // ページャー
     [SerializeField] PagerControl _pager;
 
+    // セル一覧の親オブジェクト
+    [SerializeField] Transform _contentsParent;
+
+    // アイテムセル用のプレハブ
+    [SerializeField] GameObject _itemCellPrefab;
+
     // アイテムセルのリスト
-    [SerializeField] List<ItemCell> _itemCellList = new List<ItemCell>();
+    List<ItemCell> _itemCellList = new List<ItemCell>();
 
     // 所持するアイテム一覧
-    List<ItemData> _itemDataList = new List<ItemData>();
+    //List<ItemData> _itemDataList = new List<ItemData>();
 
     // ページごとに分かれたアイテム一覧
     Dictionary<int, List<ItemData>> _itemDataDict = new Dictionary<int, List<ItemData>>();
@@ -40,8 +49,21 @@ public class InventoryWindow : WindowBase
             _pager.DisplayIndex = _currentPageNum;
 
             // UIの更新
-            UpdateItemUI(_itemDataDict[_currentPageNum]);
+            if(_itemDataDict.ContainsKey(_currentPageNum))
+            {
+                UpdateItemUI(_itemDataDict[_currentPageNum]);
+            }
         }
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
     }
 
     /// <summary>
@@ -54,6 +76,72 @@ public class InventoryWindow : WindowBase
 
         // 初期化
         CurrentPageNum = 0;
+
+        // アイテム情報の更新
+        SetData(GetDataList());
+
+        // アイテム一覧ないなら作成
+        if(_itemCellList == null || _itemCellList.Count != SHOW_ITEM_NUM)
+        {
+            CreateItemCell();
+        }
+        // 作成済みならUIの更新
+        else
+        {
+            UpdateCurrentPageItemUI();
+        }
+    }
+
+    /// <summary>
+    /// アイテム一覧の作成
+    /// </summary>
+    void CreateItemCell()
+    {
+        // アイテム一覧を削除
+        foreach (var cell in _itemCellList)
+        {
+            Destroy(cell);
+        }
+
+        // リストを初期化
+        _itemCellList.Clear();
+        navigationLayer.RemoveNavigatorAll();
+
+        // 一覧作成
+        for (int i = 0; i < SHOW_ITEM_NUM; i++)
+        {
+            var obj = Instantiate(_itemCellPrefab, _contentsParent);
+            obj.name = obj.name + "_" + i;
+            obj.SetActive(true);
+
+            // アイテム情報の設定
+            var itemCell = obj.GetComponent<ItemCell>();
+            itemCell.SetUIContents(_itemDataDict[CurrentPageNum][i]);
+
+            // アイテム一覧に追加
+            if (itemCell != null)
+            {
+                _itemCellList.Add(itemCell);
+            }
+
+            // ナビゲーターの追加
+            navigationLayer.AddNavigator(itemCell.GetComponent<Navigator>());
+        }
+
+        // ナビゲータの十字方向の設定
+        navigationLayer.SetVerticalNavigtor();
+
+        // 初期カーソル位置の設定
+        navigationLayer.SetCurrentNavigatorFromIndex(0);
+    }
+
+    /// <summary>
+    /// アイテムのUI更新(現在のページ)
+    /// </summary>
+    /// <param name="dataList"></param>
+    public void UpdateCurrentPageItemUI()
+    {
+        UpdateItemUI(_itemDataDict[_currentPageNum]);
     }
 
     /// <summary>
@@ -62,6 +150,11 @@ public class InventoryWindow : WindowBase
     /// <param name="dataList"></param>
     public void UpdateItemUI(List<ItemData> dataList)
     {
+        if (dataList == null || dataList.Count == 0)
+        {
+            return;
+        }
+
         for (int i = 0; i < _itemCellList.Count; i++)
         {
             _itemCellList[i].SetUIContents(dataList[i]);
@@ -71,29 +164,89 @@ public class InventoryWindow : WindowBase
     /// <summary>
     /// アイテムの追加
     /// </summary>
-    /// <param name="charaId">キャラID</param>
     /// <param name="data">アイテムID</param>
     /// <returns>結果</returns>
-    public bool AddItem(int charaId, int itemId)
+    public bool AddItem(List<int> idList)
     {
-        //// マスタデータが存在するか
-        //if (_mstItemData == null)
-        //{
-        //    Debug.LogError("<color=red>アイテムのマスタデータがないので追加できません</color>");
-        //    return false;
-        //}
+        // 追加するものがない
+        if (idList == null || idList.Count == 0)
+        {
+            return false;
+        }
 
-        //// idが存在するか確認
-        //if (!_mstItemData.ContainsKey(itemId))
-        //{
-        //    Debug.LogError("<color=red>ID = " + itemId + "のデータはマスタデータに存在しないです</color>");
-        //    return false;
-        //}
+        var itemList = new List<ItemData>();
 
-        //// マスタデータからアイテムの情報を取得する
-        //var data = _mstItemData[itemId];
-        //return AddItem(charaId, data);
-        return false;
+        foreach (var id in idList)
+        {
+            // idが存在するか確認
+            if (!ItemTableHelper.ContainsItemId(id))
+            {
+                Debug.LogError("ID = " + id + "のデータはマスタデータに存在しないです");
+                continue;
+            }
+
+            // マスタデータからアイテムの情報を取得する
+            itemList.Add(new ItemData(ItemTableHelper.MstItemData[id]));
+        }
+
+        // 追加できるものが何もない
+        if (itemList.Count == 0)
+        {
+            return false;
+        }
+
+        return AddItem(itemList);
+    }
+
+    /// <summary>
+    /// アイテムの追加
+    /// </summary>
+    /// <param name="data">アイテム</param>
+    /// <returns>結果</returns>
+    public bool AddItem(List<ItemData> dataList)
+    {
+        var itemList = GetDataList();
+
+        foreach (var data in dataList)
+        {
+            // アイテムが所持数制限を超えていれば追加しない
+            if (IsItemFull(itemList))
+            {
+                break;
+            }
+
+            itemList.Add(data);
+        }
+
+        // データをページごとに設定
+        SetData(itemList);
+
+        // アイテムのUIを更新
+        if (gameObject.activeSelf)
+        {
+            UpdateCurrentPageItemUI();
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// アイテムがいっぱいかどうか
+    /// </summary>
+    /// <returns></returns>
+    public bool IsItemFull(List<ItemData> itemList = null)
+    {
+        itemList = itemList == null ? GetDataList() : itemList;
+
+        if (itemList.Count >= MAX_ITEM)
+        {
+            Debug.LogError("アイテムがいっぱいです。");
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -104,9 +257,9 @@ public class InventoryWindow : WindowBase
     {
         // アイテムデータを一つのリストにする
         List<ItemData> itemDatalist = new List<ItemData>();
-        for (int page = 0; page < ItemManager.MAX_PAGE; page++)
+        for (int page = 0; page < MAX_PAGE; page++)
         {
-            for (int select = 0; select < ItemManager.MAX_SHOW_ITEM; select++)
+            for (int select = 0; select < SHOW_ITEM_NUM; select++)
             {
                 try
                 {
@@ -118,7 +271,6 @@ public class InventoryWindow : WindowBase
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError("リスト化失敗？：" + e);
                     return null;
                 }
             }
@@ -134,28 +286,17 @@ public class InventoryWindow : WindowBase
     /// <param name="datas"></param>
     void SetData(List<ItemData> datas)
     {
-        if (datas == null)
-        {
-            Debug.LogError("データがありません");
-            return;
-        }
-        if (datas.Count == ItemManager.MAX_SHOW_ITEM * ItemManager.MAX_PAGE)
-        {
-            Debug.LogError("データが足りません");
-            return;
-        }
-
         // ソートしたデータを_itemDataDictに戻す
-        for (int i = 0; i < ItemManager.MAX_PAGE; i++)
+        for (int i = 0; i < MAX_PAGE; i++)
         {
             var dataList = new List<ItemData>();
 
-            for (int j = 0; j < ItemManager.MAX_SHOW_ITEM; j++)
+            for (int j = 0; j < SHOW_ITEM_NUM; j++)
             {
                 // 取得したデータの中身がなくてもリストは用意する
-                if ((j + ItemManager.MAX_SHOW_ITEM * i) < datas.Count)
+                if (datas != null && (j + SHOW_ITEM_NUM * i) < datas.Count)
                 {
-                    dataList.Add(datas[j + (ItemManager.MAX_SHOW_ITEM * i)]);
+                    dataList.Add(datas[j + (SHOW_ITEM_NUM * i)]);
                 }
                 else
                 {
