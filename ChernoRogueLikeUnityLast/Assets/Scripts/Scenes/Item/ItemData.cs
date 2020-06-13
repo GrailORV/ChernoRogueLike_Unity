@@ -1,26 +1,18 @@
 ﻿public class ItemData
 {
     /// <summary> ID </summary>
-    int _id = -1;
-    public int Id
-    {
-        get { return _id; }
-        set { _id = value; }
-    }
+    public int Id { get; set; }
 
     /// <summary> 種類 </summary>
-    string _type = "";
-    public string Type
-    {
-        get { return _type; }
-        set { _type = value; }
-    }
+    public string Type { get; set; }
 
     /// <summary> 名前 </summary>
-    string _name = "";
-    public string Name
+    public string Name { get; set; }
+
+    public ItemData(ItemTableData.Data data)
     {
-        get { return _name; }
-        set { _name = value; }
+        Id = data.id;
+        Type = data.type;
+        Name = data.name;
     }
 }

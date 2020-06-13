@@ -49,16 +49,4 @@ public class ItemCell: MonoBehaviour
         // 表示
         gameObject.SetActive(true);
     }
-
-    /// <summary>
-    /// 削除されたとき呼ばれる
-    /// </summary>
-    void OnDestroy()
-    {
-        // 保持していた変数の初期化
-        _rectTransform = null;
-        _nameText = null;
-        _sumbnailImage.sprite = null;
-        _sumbnailImage = null;
-    }
 }
