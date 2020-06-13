@@ -5,23 +5,7 @@ using UnityEngine;
 
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
-    // 表示するアイテムの最大数
-    public static readonly int MAX_SHOW_ITEM = 10;
-
-    // アイテムのページの最大数
-    public static readonly int MAX_PAGE = 3;
-
-    // アイテムの最大数
-    public static readonly int MAX_ITEM = MAX_SHOW_ITEM * MAX_PAGE;
-
-    // アイテムのマスタデータ
-    // key:アイテムのID value:アイテムデータ
-    Dictionary<int, ItemData> _mstItemData = new Dictionary<int, ItemData>();
-
-    // 全キャラクターのアイテム情報
-    // key:CharaID value:ItemData(List)
-    Dictionary<int, List<ItemData>> _itemDataDict = new Dictionary<int, List<ItemData>>();
-
+    /*
     /// <summary>
     /// Instance生成時に呼ばれる処理
     /// </summary>
@@ -30,12 +14,12 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         base.Awake();
 
         // アイテムのマスターデータの取得
-        _mstItemData = ItemDataModifier.GetMstItemData();
+        //_mstItemData = ItemDataModifier.GetMstItemData();
 
         // 全キャラクターのアイテム情報を取得
         // TODO ID管理と仮定しているので変更の可能性あり…現状はプレイヤーのみ
-        var dataList = ItemDataModifier.ReadItemData();
-        _itemDataDict.Add(0, dataList);
+        //var dataList = ItemDataModifier.ReadItemData();
+        //_itemDataDict.Add(0, dataList);
     }
 
     /// <summary>
@@ -188,7 +172,7 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
         }
 
         // 空のデータを追加
-        dataList.Add(new ItemData());
+        //dataList.Add(new ItemData());
         return result;
     }
 
@@ -229,4 +213,5 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     {
         return DeleteItem(0, data);
     }
+    */
 }
