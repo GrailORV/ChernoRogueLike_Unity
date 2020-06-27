@@ -34,24 +34,24 @@ public class InventoryWindow : WindowBase
     Dictionary<int, List<ItemData>> _itemDataDict = new Dictionary<int, List<ItemData>>();
 
     // 現在のページ数
-    int _currentPageNum = 0;
+    int _currentPageIndex = 0;
 
     // 現在のページ数
-    public int CurrentPageNum
+    public int CurrentPageIndex
     {
-        get { return _currentPageNum; }
+        get { return _currentPageIndex; }
         set
         {
             // 値が範囲外にいかないようにする
-            _currentPageNum = Mathf.Clamp(value, 0, MAX_PAGE - 1);
+            _currentPageIndex = Mathf.Clamp(value, 0, MAX_PAGE - 1);
 
             // ページャーの切り替え
-            _pager.DisplayIndex = _currentPageNum;
+            _pager.DisplayIndex = _currentPageIndex;
 
             // UIの更新
-            if(_itemDataDict.ContainsKey(_currentPageNum))
+            if(_itemDataDict.ContainsKey(_currentPageIndex))
             {
-                UpdateItemUI(_itemDataDict[_currentPageNum]);
+                UpdateItemUI(_itemDataDict[_currentPageIndex]);
             }
         }
     }
@@ -75,7 +75,7 @@ public class InventoryWindow : WindowBase
         _pager.Init(MAX_PAGE);
 
         // 初期化
-        CurrentPageNum = 0;
+        CurrentPageIndex = 0;
 
         // アイテム情報の更新
         SetData(GetDataList());
@@ -116,7 +116,7 @@ public class InventoryWindow : WindowBase
 
             // アイテム情報の設定
             var itemCell = obj.GetComponent<ItemCell>();
-            itemCell.SetUIContents(_itemDataDict[CurrentPageNum][i]);
+            itemCell.SetUIContents(_itemDataDict[CurrentPageIndex][i]);
 
             // アイテム一覧に追加
             if (itemCell != null)
@@ -144,7 +144,7 @@ public class InventoryWindow : WindowBase
     /// <param name="dataList"></param>
     public void UpdateCurrentPageItemUI()
     {
-        UpdateItemUI(_itemDataDict[_currentPageNum]);
+        UpdateItemUI(_itemDataDict[CurrentPageIndex]);
     }
 
     /// <summary>
