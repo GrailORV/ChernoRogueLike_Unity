@@ -11,6 +11,12 @@
 
     public ItemData(ItemTableData.Data data)
     {
+        if (data == null)
+        {
+            Id = -1;
+            return;
+        }
+
         Id = data.id;
         Type = data.type;
         Name = data.name;

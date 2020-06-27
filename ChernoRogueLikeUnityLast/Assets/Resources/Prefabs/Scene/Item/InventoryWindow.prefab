@@ -178,6 +178,11 @@ MonoBehaviour:
     keys: 
     target: {fileID: 1314918057971130}
     methodName: OnSelectButtonDown
+  - type: 1
+    key: 2
+    keys: 
+    target: {fileID: 1314918057971130}
+    methodName: SortInventory
   _navigatorList:
   - {fileID: 0}
   - {fileID: 0}

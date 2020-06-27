@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InventoryWindow : WindowBase
@@ -253,6 +254,20 @@ public class InventoryWindow : WindowBase
     }
 
     /// <summary>
+    /// 整頓する
+    /// </summary>
+    public void SortInventory()
+    {
+        var dataList = GetDataList();
+
+        if (dataList != null)
+        {
+            // ID順のソートを行う
+            dataList.OrderBy(data => data.Id);
+        }
+    }
+
+    /// <summary>
     /// ぺージごとに分けているデータを取得
     /// </summary>
     /// <returns></returns>
@@ -303,7 +318,7 @@ public class InventoryWindow : WindowBase
                 }
                 else
                 {
-                    dataList.Add(null);
+                    dataList.Add(new ItemData(null));
                     continue;
                 }
             }
