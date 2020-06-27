@@ -312,4 +312,32 @@ public class InventoryWindow : WindowBase
             _itemDataDict[i] = dataList;
         }
     }
+
+    #region 入力処理
+
+    /// <summary>
+    /// ページ変更
+    /// </summary>
+    /// <param name="direction"></param>
+    public void OnSelectButtonDown(NavigationManager.InputDirection direction)
+    {
+        // 左右の時はページの切り替え
+        switch (direction)
+        {
+            case NavigationManager.InputDirection.Left:
+                if (CurrentPageIndex > 0)
+                {
+                    CurrentPageIndex--;
+                }
+                break;
+
+            case NavigationManager.InputDirection.Right:
+                if (CurrentPageIndex + 1 <= MAX_PAGE)
+                {
+                    CurrentPageIndex++;
+                }
+                break;
+        }
+    }
+    #endregion
 }

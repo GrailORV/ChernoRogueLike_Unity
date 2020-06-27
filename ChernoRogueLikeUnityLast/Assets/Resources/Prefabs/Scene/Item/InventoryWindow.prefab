@@ -172,7 +172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54ffc961571b5d04899730a19cec7938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _commandList: []
+  _commandList:
+  - type: 1
+    key: 12
+    keys: 
+    target: {fileID: 1314918057971130}
+    methodName: OnSelectButtonDown
   _navigatorList:
   - {fileID: 0}
   - {fileID: 0}
@@ -249,6 +254,7 @@ MonoBehaviour:
   _animDelayTime: 0
   _tweenType: 1
   navigationLayer: {fileID: 114453757468783100}
+  _isDefaultInput: 1
   _pager: {fileID: 114082812720269920}
   _contentsParent: {fileID: 224220064514387708}
   _itemCellPrefab: {fileID: 1225838873283858, guid: 922faadc199cbcf418fb450b85d8c0dd,
