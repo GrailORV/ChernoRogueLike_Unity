@@ -580,7 +580,7 @@ public class NavigationLayer : MonoBehaviour
     /// </summary>
     private void SetSelectNavigator(bool isVertical, bool isHorizontal)
     {
-        if(_navigatorList.Count == 0 || isVertical == isHorizontal == false)
+        if(_navigatorList.Count == 0 || !isVertical && !isHorizontal)
         {
             return;
         }

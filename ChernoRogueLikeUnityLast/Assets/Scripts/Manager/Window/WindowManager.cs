@@ -73,13 +73,15 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="type"></param>
-    public void CreateAndOpenWindow<T>(WindowData.WindowType type) where T : WindowBase
+    public T CreateAndOpenWindow<T>(WindowData.WindowType type) where T : WindowBase
     {
         var window = CreateWindow<T>(type);
         if(window != null)
         {
             window.Open();
         }
+
+        return window;
     }
 
     /// <summary>

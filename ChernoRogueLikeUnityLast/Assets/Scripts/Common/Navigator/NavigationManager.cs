@@ -209,9 +209,13 @@ public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
             CurrentLayer = _highLayerList.Last();
         }
         // 通常のレイヤーリストから設定
-        else
+        else if (_layerList.Count > 0)
         {
             CurrentLayer = _layerList.Last();
+        }
+        else
+        {
+            CurrentLayer = null;
         }
     }
 }

@@ -27,6 +27,10 @@ public class WindowBase : MonoBehaviour
     [Header("ナビゲーションレイヤー")]
     public NavigationLayer navigationLayer;
 
+    // デフォルトで操作可能にするかどうか
+    [Header("デフォルトで操作可能にするかどうか")]
+    [SerializeField] bool _isDefaultInput = true;
+
     // 削除時に呼ばれるコールバック
     public System.Action OnDestroyAction = null;
 
@@ -107,6 +111,7 @@ public class WindowBase : MonoBehaviour
         if (navigationLayer != null)
         {
             NavigationManager.Instance.PushLayer(navigationLayer);
+            NavigationManager.Instance.IsKeyInput = _isDefaultInput;
         }
     }
 
