@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class ItemWindow : WindowBase
 {
+    /*
     // アイテムのページャー
     [SerializeField] PagerControl _pager = null;
 
@@ -542,4 +543,5 @@ public class ItemWindow : WindowBase
             DeleteItem(CurrentSelectIndex, CurrentPageNum);
         }
     }
+    */
 }

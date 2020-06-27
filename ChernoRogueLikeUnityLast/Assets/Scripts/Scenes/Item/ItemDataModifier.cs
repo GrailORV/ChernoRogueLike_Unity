@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-
+/*
 /// <summary>
 /// アイテムのデータのやり取り
 /// </summary>
@@ -255,3 +255,4 @@ public class ItemDataModifier
         Debug.LogFormat("csv.text = " + itemCsvText);
     }
 }
+*/
