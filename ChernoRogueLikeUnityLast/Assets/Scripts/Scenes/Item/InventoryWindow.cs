@@ -7,7 +7,7 @@ public class InventoryWindow : WindowBase
     [Space(20)]
 
     // ページ数
-    const int MAX_PAGE = 4;
+    const int MAX_PAGE = 3;
 
     // 表示するアイテム数
     const int SHOW_ITEM_NUM = 10;
