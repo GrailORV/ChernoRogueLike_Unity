@@ -27,26 +27,36 @@ public class ItemCell: MonoBehaviour
         set { _sumbnailImage = value; }
     }
 
+    bool _isEmpty = false;
+
     /// <summary>
     /// UIの設定
     /// </summary>
     public void SetUIContents(ItemData data)
     {
-        if(data == null)
+        if(data == null || data.Id < 0)
         {
-            gameObject.SetActive(false);
+            ShowEmpty();
             return;
         }
-        if (data.Id < 0)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
+
+        _isEmpty = false;
 
         // TODO まだ名前のみ
         _nameText.text = data.Name;
 
         // 表示
         gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// 「なし」表示の状態にする
+    /// </summary>
+    public void ShowEmpty()
+    {
+        _isEmpty = true;
+
+        NameText.text = "なし";
+        Sumbnail.gameObject.SetActive(false);
     }
 }
