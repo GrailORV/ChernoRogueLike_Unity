@@ -71,6 +71,84 @@ public class InputControllerManager
     public double Threshold { get; private set; }
 
     /// <summary>
+    /// ボタンとキーボードのキー設定を行う
+    /// </summary>
+    public void SetDefaultButtonAndKeyboard()
+    {
+        // コントローラーの初期化
+        _controllerList = new List<Controller>();
+
+        // unity用の対応
+        var controller = new Controller();
+
+        // 上の段がゲームパッド用
+        // 下の段がキーボード用
+
+        // □
+        controller.ButtonDict[Controller.Button.Button_0].AddKeyName("Square");
+        controller.ButtonDict[Controller.Button.Button_0].AddKeyCode(KeyCode.R);
+
+        // ×
+        controller.ButtonDict[Controller.Button.Button_1].AddKeyName("Cross");
+        controller.ButtonDict[Controller.Button.Button_1].AddKeyCode(KeyCode.E);
+
+        // 〇
+        controller.ButtonDict[Controller.Button.Button_2].AddKeyName("Circle");
+        controller.ButtonDict[Controller.Button.Button_2].AddKeyCode(KeyCode.F);
+
+        // △
+        controller.ButtonDict[Controller.Button.Button_3].AddKeyName("Triangle");
+        controller.ButtonDict[Controller.Button.Button_3].AddKeyCode(KeyCode.Q);
+
+        // L1
+        controller.ButtonDict[Controller.Button.Button_4].AddKeyName("Left1");
+
+        // R1
+        controller.ButtonDict[Controller.Button.Button_5].AddKeyName("Right1");
+
+        // L2
+        controller.ButtonDict[Controller.Button.Button_6].AddKeyName("Left2");
+
+        // R2
+        controller.ButtonDict[Controller.Button.Button_7].AddKeyName("Right2");
+
+        // share
+        controller.ButtonDict[Controller.Button.Button_8].AddKeyName("Share");
+        controller.ButtonDict[Controller.Button.Button_8].AddKeyCode(KeyCode.P);
+
+        // Option
+        controller.ButtonDict[Controller.Button.Button_9].AddKeyName("Option");
+        controller.ButtonDict[Controller.Button.Button_9].AddKeyCode(KeyCode.Escape);
+
+        // L3
+        controller.ButtonDict[Controller.Button.Button_10].AddKeyName("Left3");
+
+        // R3
+        controller.ButtonDict[Controller.Button.Button_11].AddKeyName("Right3");
+
+        // Lスティック
+        controller.AxisDict[Controller.Axis.L_Horizontal].AddKeyName("LeftHorizontal");
+        controller.AxisDict[Controller.Axis.L_Vertical].　AddKeyName("LeftVertical");
+        controller.AxisDict[Controller.Axis.L_Horizontal].AddKeyCode(KeyCode.D, KeyCode.A);
+        controller.AxisDict[Controller.Axis.L_Vertical]　.AddKeyCode(KeyCode.W, KeyCode.S);
+
+        // Rスティック
+        controller.AxisDict[Controller.Axis.R_Horizontal].AddKeyName("RightHorizontal");
+        controller.AxisDict[Controller.Axis.R_Vertical]　.AddKeyName("RightVertical");
+        controller.AxisDict[Controller.Axis.R_Horizontal].AddKeyCode(KeyCode.RightArrow, KeyCode.LeftArrow);
+        controller.AxisDict[Controller.Axis.R_Vertical]　.AddKeyCode(KeyCode.UpArrow, KeyCode.DownArrow);
+
+        // 十字キー
+        controller.AxisDict[Controller.Axis.Cross_Horizontal].AddKeyName("CrossHorizontal");
+        controller.AxisDict[Controller.Axis.Cross_Vertical]　.AddKeyName("CrossVertical");
+        controller.AxisDict[Controller.Axis.Cross_Horizontal].AddKeyCode(KeyCode.RightArrow, KeyCode.LeftArrow);
+        controller.AxisDict[Controller.Axis.Cross_Vertical]　.AddKeyCode(KeyCode.UpArrow, KeyCode.DownArrow);
+
+        // コントローラーを追加する
+        AddController(controller);
+    }
+
+    /// <summary>
     /// unityのデフォルトのInputを対応させる
     /// </summary>
     public void SetDefaultButton()

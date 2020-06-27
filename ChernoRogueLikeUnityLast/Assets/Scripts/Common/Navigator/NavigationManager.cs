@@ -91,11 +91,8 @@ public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
         // キーの初期化
         _inputManager = new InputControllerManager();
 
-        // キーボードのキーの割り当て
-        //_inputManager.SetForKeyboard();
-
-        // コントローラーのキーの割り当て
-        _inputManager.SetDefaultButton();
+        // キーの割り当て
+        _inputManager.SetDefaultButtonAndKeyboard();
     }
 
     void Update()

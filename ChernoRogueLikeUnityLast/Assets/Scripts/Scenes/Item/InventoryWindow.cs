@@ -128,7 +128,10 @@ public class InventoryWindow : WindowBase
             navigationLayer.AddNavigator(itemCell.GetComponent<Navigator>());
         }
 
-        // ナビゲータの十字方向の設定
+        // セルの整列
+        Canvas.ForceUpdateCanvases();
+
+        // ナビゲーターの上下方向の設定
         navigationLayer.SetVerticalNavigtor();
 
         // 初期カーソル位置の設定
