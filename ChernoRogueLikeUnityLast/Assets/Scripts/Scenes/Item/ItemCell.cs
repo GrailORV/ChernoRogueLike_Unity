@@ -35,7 +35,11 @@ public class ItemCell: MonoBehaviour
     /// </summary>
     public void SetUIContents(ItemData data)
     {
-        if(data == null || data.Id < 0)
+        // オブジェクトは必ず表示
+        gameObject.SetActive(true);
+
+        // アイテムが無ければ専用の表示にする
+        if (data == null || data.Id < 0)
         {
             ShowEmpty();
             return;
@@ -43,11 +47,9 @@ public class ItemCell: MonoBehaviour
 
         IsEmpty = false;
 
-        // TODO まだ名前のみ
+        // データに沿って情報の設定
         _nameText.text = data.Name;
-
-        // 表示
-        gameObject.SetActive(true);
+        Sumbnail.gameObject.SetActive(true);
     }
 
     /// <summary>
