@@ -725,6 +725,11 @@ public class NavigationLayer : MonoBehaviour
             CurrentNavigator = _navigatorList[index];
             result = true;
         }
+        else
+        {
+            CurrentNavigator = _navigatorList[_navigatorList.Count - 1];
+            result = true;
+        }
 
         return result;
     }
