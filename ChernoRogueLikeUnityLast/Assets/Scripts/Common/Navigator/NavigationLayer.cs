@@ -712,26 +712,26 @@ public class NavigationLayer : MonoBehaviour
     /// <returns></returns>
     public bool SetCurrentNavigatorFromIndex(int index)
     {
-        var result = false;
-
         if(_navigatorList.Count == 0)
         {
-            return result;
+            return false;
         }
 
         // CurrentNavigatorの設定
-        if(index < _navigatorList.Count)
+        if(index < 0)
+        {
+            CurrentNavigator = _navigatorList[0];
+        }
+        else if(index < _navigatorList.Count)
         {
             CurrentNavigator = _navigatorList[index];
-            result = true;
         }
         else
         {
             CurrentNavigator = _navigatorList[_navigatorList.Count - 1];
-            result = true;
         }
 
-        return result;
+        return true;
     }
 
     #endregion
