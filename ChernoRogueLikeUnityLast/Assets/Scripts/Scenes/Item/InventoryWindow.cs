@@ -124,16 +124,13 @@ public class InventoryWindow : WindowBase
             {
                 _itemCellList.Add(itemCell);
             }
-
-            // ナビゲーターの追加
-            navigationLayer.AddNavigator(itemCell.GetComponent<Navigator>());
         }
 
         // セルの整列
         Canvas.ForceUpdateCanvases();
 
-        // ナビゲーターの上下方向の設定
-        navigationLayer.SetVerticalNavigtor();
+        // ナビゲーターの設定
+        SetUpNavigator();
 
         // 初期カーソル位置の設定
         navigationLayer.SetCurrentNavigatorFromIndex(0);
@@ -159,10 +156,14 @@ public class InventoryWindow : WindowBase
             return;
         }
 
+        // UIの更新
         for (int i = 0; i < _itemCellList.Count; i++)
         {
             _itemCellList[i].SetUIContents(dataList[i]);
         }
+
+        // ナビゲーターの設定
+        SetUpNavigator();
     }
 
     /// <summary>
@@ -328,7 +329,32 @@ public class InventoryWindow : WindowBase
         }
     }
 
-    #region 入力処理
+    #region 入力関係
+
+    /// <summary>
+    /// ナビゲーターの設定
+    /// </summary>
+    private void SetUpNavigator()
+    {
+        // エントリーポイントの初期化
+        navigationLayer.RemoveNavigatorAll();
+        navigationLayer.CurrentNavigator = null;
+
+        foreach (var cell in _itemCellList)
+        {
+            // 中身のあるオブジェクトのみ選択可能
+            if(!cell.IsEmpty)
+            {
+                navigationLayer.AddNavigator(cell.GetComponent<Navigator>());
+            }
+        }
+
+        // ナビゲーターの上下方向の設定
+        navigationLayer.SetVerticalNavigtor();
+
+        // 最初のカーソル位置を設定
+        var result = navigationLayer.SetCurrentNavigatorFromIndex(navigationLayer.GetDefaultIndex());
+    }
 
     /// <summary>
     /// ページ変更

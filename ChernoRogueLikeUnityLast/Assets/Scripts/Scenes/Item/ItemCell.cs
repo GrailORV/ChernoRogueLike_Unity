@@ -27,7 +27,8 @@ public class ItemCell: MonoBehaviour
         set { _sumbnailImage = value; }
     }
 
-    bool _isEmpty = false;
+    // データが無い状態かどうか
+    public bool IsEmpty { get; private set; }
 
     /// <summary>
     /// UIの設定
@@ -40,7 +41,7 @@ public class ItemCell: MonoBehaviour
             return;
         }
 
-        _isEmpty = false;
+        IsEmpty = false;
 
         // TODO まだ名前のみ
         _nameText.text = data.Name;
@@ -54,7 +55,7 @@ public class ItemCell: MonoBehaviour
     /// </summary>
     public void ShowEmpty()
     {
-        _isEmpty = true;
+        IsEmpty = true;
 
         NameText.text = "なし";
         Sumbnail.gameObject.SetActive(false);
