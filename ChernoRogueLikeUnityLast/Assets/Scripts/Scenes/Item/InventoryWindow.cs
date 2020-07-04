@@ -220,7 +220,9 @@ public class InventoryWindow : WindowBase
                 break;
             }
 
-            itemList.Add(data);
+            // 空きがある場所にアイテムの情報を入れる
+            var index = itemList.FindIndex(_ => _.Id < 0);
+            itemList[index] = data;
         }
 
         // データをページごとに設定
