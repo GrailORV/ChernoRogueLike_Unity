@@ -245,15 +245,14 @@ public class InventoryWindow : WindowBase
     {
         itemList = itemList == null ? GetDataList() : itemList;
 
-        if (itemList.Count >= MAX_ITEM)
-        {
-            Debug.LogError("アイテムがいっぱいです。");
-            return true;
-        }
-        else
+        // 一つでも空きがあればfalse
+        if (itemList == null || itemList.Any(data => data.Id < 0))
         {
             return false;
         }
+
+        Debug.LogError("アイテムがいっぱいです。");
+        return true;
     }
 
     /// <summary>
