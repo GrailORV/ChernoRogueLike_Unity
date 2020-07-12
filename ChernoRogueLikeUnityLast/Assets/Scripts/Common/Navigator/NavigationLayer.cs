@@ -150,6 +150,12 @@ public class NavigationLayer : MonoBehaviour
 
         // ナビゲーターの更新
         UpdateNavigatAction(inputManager);
+
+        // カレントナビゲーターの入力チェック
+        if(CurrentNavigator != null && CurrentNavigator.gameObject.activeInHierarchy)
+        {
+            CurrentNavigator.KeyUpdate(inputManager);
+        }
     }
 
     /// <summary>

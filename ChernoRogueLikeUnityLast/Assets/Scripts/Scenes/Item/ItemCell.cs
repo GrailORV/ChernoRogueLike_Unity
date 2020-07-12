@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemCell: MonoBehaviour
@@ -27,26 +28,34 @@ public class ItemCell: MonoBehaviour
         set { _sumbnailImage = value; }
     }
 
+    // データが無い状態かどうか
+    public bool IsEmpty { get; private set; }
+
     // UIの管理用オブジェクト
     [SerializeField] GameObject _contentsRoot;
 
-    // データが無い状態かどうか
-    public bool IsEmpty { get; private set; }
+    // 入力時の処理
+    public Action<ItemData> OnClickAction;
+
+    // アイテムの情報
+    ItemData _itemData;
 
     /// <summary>
     /// UIの設定
     /// </summary>
     public void SetUIContents(ItemData data)
     {
+        _itemData = data;
+
         // オブジェクトは必ず表示
         gameObject.SetActive(true);
 
         // アイテムあるかどうか
-        IsEmpty = data == null || data.Id < 0;
+        IsEmpty = _itemData == null || _itemData.Id < 0;
         ShowItem(!IsEmpty);
 
         // データに沿って情報の設定
-        NameText.text = data.Name;
+        NameText.text = _itemData.Name;
         Sumbnail.gameObject.SetActive(true);
     }
 
@@ -56,5 +65,18 @@ public class ItemCell: MonoBehaviour
     public void ShowItem(bool show)
     {
         _contentsRoot.SetActive(show);
+    }
+
+    /// <summary>
+    /// セルを選択した時の処理
+    /// </summary>
+    public void OnClickCell()
+    {
+        if (_itemData == null || OnClickAction == null)
+        {
+            return;
+        }
+
+        OnClickAction.SafeInvoke(_itemData);
     }
 }

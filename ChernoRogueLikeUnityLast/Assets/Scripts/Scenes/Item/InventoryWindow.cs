@@ -25,6 +25,9 @@ public class InventoryWindow : WindowBase
     // アイテムセル用のプレハブ
     [SerializeField] GameObject _itemCellPrefab;
 
+    // メニューウィンドウ
+    [SerializeField] InventoryMenuWindow _inventoryMenuWindow;
+
     // アイテムセルのリスト
     List<ItemCell> _itemCellList = new List<ItemCell>();
 
@@ -81,6 +84,9 @@ public class InventoryWindow : WindowBase
         // アイテム情報の更新
         SetData(GetDataList());
 
+        ItemTableHelper.Load();
+        AddItem(new List<int>() { 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 });
+
         // アイテム一覧ないなら作成
         if(_itemCellList == null || _itemCellList.Count != SHOW_ITEM_NUM)
         {
@@ -118,6 +124,14 @@ public class InventoryWindow : WindowBase
             // アイテム情報の設定
             var itemCell = obj.GetComponent<ItemCell>();
             itemCell.SetUIContents(_itemDataDict[CurrentPageIndex][i]);
+
+            // セルの選択時の処理を追加
+            itemCell.OnClickAction = data =>
+            {
+                // メニュー画面を表示
+                _inventoryMenuWindow.Open();
+                _inventoryMenuWindow.SetUp(data);
+            };
 
             // アイテム一覧に追加
             if (itemCell != null)
@@ -382,4 +396,18 @@ public class InventoryWindow : WindowBase
         }
     }
     #endregion
+
+    #region サブメニュー関係
+
+    /// <summary>
+    /// サブメニューを選択した時の処理
+    /// </summary>
+    public void OnSelectSubMenu()
+    {
+        // 選択中のコマンドを実行
+        
+    }
+
+    #endregion
+
 }

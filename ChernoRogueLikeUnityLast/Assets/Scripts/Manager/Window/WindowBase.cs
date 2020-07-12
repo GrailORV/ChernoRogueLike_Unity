@@ -99,7 +99,7 @@ public class WindowBase : MonoBehaviour
     protected virtual void Awake()
     {
         // 初期は非表示
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     /// <summary>

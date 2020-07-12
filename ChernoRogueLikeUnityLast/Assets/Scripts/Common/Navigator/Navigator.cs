@@ -1,10 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using InputController;
 
 public class Navigator : MonoBehaviour
 {
+    [Serializable]
+    public class KeyCommand
+    {
+        public GameObject target;
+        public string methodName;
+    }
+
     [SerializeField] Navigator _up;
     [SerializeField] Navigator _down;
     [SerializeField] Navigator _left;
@@ -12,6 +21,9 @@ public class Navigator : MonoBehaviour
 
     // 選択したときにアクティブになるオブジェクト
     [SerializeField] List<GameObject> _cursorList = new List<GameObject>();
+
+    // 〇ボタンを押したときのコマンド
+    [SerializeField] List<KeyCommand> _circleCommandList = new List<KeyCommand>();
 
     public void OnHover(bool isHover)
     {
@@ -134,12 +146,43 @@ public class Navigator : MonoBehaviour
         foreach (var cursor in _cursorList)
         {
             // アクティブ状態に変更がないなら次へ
-            if(cursor.activeSelf == isActive)
+            if (cursor.activeSelf == isActive)
             {
                 continue;
             }
 
             cursor.SetActive(isActive);
         }
+    }
+
+    /// <summary>
+    /// 入力操作のUpdate
+    /// </summary>
+    public void KeyUpdate(InputControllerManager inputManager)
+    {
+        // 入力のチェックを行う
+        foreach (var command in _circleCommandList)
+        {
+            CheckButtonAction(command, inputManager);
+        }
+    }
+
+    /// <summary>
+    /// ボタン入力の確認
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="inputManager"></param>
+    void CheckButtonAction(KeyCommand command, InputControllerManager inputManager)
+    {
+        var result = false;
+        var key = Controller.Button.Button_2;
+
+        if (command.target == null || string.IsNullOrEmpty(command.methodName))
+        {
+            return;
+        }
+
+        // 入力
+        inputManager.GetButtonDown(key, action: () => command.target.SendMessage(command.methodName));
     }
 }
