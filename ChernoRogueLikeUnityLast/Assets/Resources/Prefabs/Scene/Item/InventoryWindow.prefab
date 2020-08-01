@@ -1053,11 +1053,12 @@ MonoBehaviour:
   _tweenType: 1
   navigationLayer: {fileID: 114453757468783100}
   _isDefaultInput: 1
+  _maxPage: 10
   _pager: {fileID: 114082812720269920}
   _contentsParent: {fileID: 224220064514387708}
   _itemCellPrefab: {fileID: 1225838873283858, guid: 922faadc199cbcf418fb450b85d8c0dd,
     type: 2}
-  _inventoryMenuWindow: {fileID: 114478100780730360}
+  _itemMenuWindow: {fileID: 114478100780730360}
 --- !u!114 &114598470633616248
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1993,7 +1994,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 1900, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224498664524514412
 RectTransform:
