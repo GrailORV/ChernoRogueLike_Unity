@@ -11,7 +11,7 @@ public class ItemTableData : ScriptableObject
     public class Data
     {
         public int id;
-        public string type;
+        public int type;
         public string name;
     }
 }
