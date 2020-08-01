@@ -593,7 +593,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54ffc961571b5d04899730a19cec7938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _commandList: []
+  _commandList:
+  - type: 1
+    key: 1
+    keys: 
+    target: {fileID: 1004238226949658}
+    methodName: Close
   _navigatorList: []
   _isUpdateDefaultIndex: 1
 --- !u!114 &114044028177819164
@@ -1047,7 +1052,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54ffc961571b5d04899730a19cec7938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _commandList: []
+  _commandList:
+  - type: 1
+    key: 1
+    keys: 
+    target: {fileID: 1777002088490612}
+    methodName: Close
   _navigatorList: []
   _isUpdateDefaultIndex: 0
 --- !u!114 &114478992721386116
