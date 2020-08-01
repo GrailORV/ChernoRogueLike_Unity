@@ -67,6 +67,8 @@ public class PagerControl : MonoBehaviour
             }
         }
 
+        _pagerList.Clear();
+
         // ページャーを作成
         for (int i = 0; i < pagerNum; i++)
         {
