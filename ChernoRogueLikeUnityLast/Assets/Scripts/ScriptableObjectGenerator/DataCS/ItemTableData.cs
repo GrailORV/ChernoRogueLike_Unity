@@ -13,5 +13,6 @@ public class ItemTableData : ScriptableObject
         public int id;
         public int type;
         public string name;
+        public string Description;
     }
 }

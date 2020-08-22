@@ -21,6 +21,9 @@ public class ItemData
     /// <summary> 名前 </summary>
     public string Name { get; set; }
 
+    /// <summary> 説明 </summary>
+    public string Description { get; set; }
+
     /// <summary> ツボのアイテム情報 </summary>
     public List<ItemData> potItemDataList { get; set; }
 
@@ -35,6 +38,7 @@ public class ItemData
         Id = data.id;
         Type = (ItemType)data.type;
         Name = data.name;
+        Description = data.Description;
 
         switch (Type)
         {

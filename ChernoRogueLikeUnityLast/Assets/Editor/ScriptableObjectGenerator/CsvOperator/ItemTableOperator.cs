@@ -106,6 +106,7 @@ public class ItemTableOperator : AssetPostprocessor
                 data.id = int.Parse(cells[0]);
                 data.type = int.Parse(cells[1]);
                 data.name = cells[2];
+                data.Description = cells[3];
 
                 // データを挿入
                 asset.dataList.Add(data);
