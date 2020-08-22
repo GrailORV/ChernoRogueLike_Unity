@@ -90,6 +90,8 @@ public class ItemMenuWindow : WindowBase
         {
             var potItemWindow = WindowManager.Instance.CreateAndOpenWindow<PotItemWindow>(WindowData.WindowType.PotItemWindow);
             potItemWindow.SetUp();
+
+            Close();
         }
     }
 
@@ -115,6 +117,9 @@ public class ItemMenuWindow : WindowBase
     public void OnClickExplanationButton()
     {
         Debug.Log("説明するよ");
+
+        var descriptionWindow = WindowManager.Instance.CreateAndOpenWindow<ItemDescriptionWindow>(WindowData.WindowType.ItemDescriptionWindow);
+        descriptionWindow.SetUp(_itemData);
     }
 
     /// <summary>
