@@ -13,8 +13,10 @@ using WindowAnimation;
  =============================================================================*/
 public class WindowBase : MonoBehaviour
 {
-    // アニメーション時間
+    //***********************************************************
     [Header("アニメーション")]
+    //***********************************************************
+    // アニメーション時間
     [SerializeField] float _animPlayTime  = 0.3f;
 
     // アニメーション開始の遅延時間
@@ -23,13 +25,26 @@ public class WindowBase : MonoBehaviour
     // アニメーションの種類(デフォルトは拡縮)
     [SerializeField] AnimationBuilder.TweenType _tweenType = AnimationBuilder.TweenType.zoom;
 
-    // ナビゲーションレイヤー
+    //***********************************************************
+    [Header("キャンバス")]
+    //***********************************************************
+    // キャンバス
+    [SerializeField] bool _useSubCanvas;
+
+    // レイヤーの表示順 大きい方が手前に表示
+    [SerializeField] int _sortOrder;
+
+    //***********************************************************
     [Header("ナビゲーションレイヤー")]
+    //***********************************************************
+    // ナビゲーションレイヤー
     public NavigationLayer navigationLayer;
 
     // デフォルトで操作可能にするかどうか
     [Header("デフォルトで操作可能にするかどうか")]
     [SerializeField] bool _isDefaultInput = true;
+
+
 
     // 削除時に呼ばれるコールバック
     public System.Action OnDestroyAction = null;
@@ -98,8 +113,18 @@ public class WindowBase : MonoBehaviour
 
     protected virtual void Awake()
     {
-        // 初期は非表示
-        //gameObject.SetActive(false);
+        // キャンバスを使用するのであればレイヤーの設定
+        if (_useSubCanvas)
+        {
+            var subCanvas = gameObject.GetComponent<Canvas>();
+            if (subCanvas == null)
+            {
+                subCanvas = gameObject.AddComponent<Canvas>();
+            }
+
+            subCanvas.overrideSorting = true;
+            subCanvas.sortingOrder = _sortOrder <= 0 ? subCanvas.sortingOrder : _sortOrder;
+        }
     }
 
     /// <summary>
