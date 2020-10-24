@@ -126,4 +126,13 @@ public class PagerControl : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// 表示しているページャーの数を取得
+    /// </summary>
+    /// <returns></returns>
+    public int GetCount()
+    {
+        return _pagerList == null ? 0 : _pagerList.Count;
+    }
 }

@@ -9,13 +9,16 @@ using UnityEngine.UI;
 /// </summary>
 public class ItemWindowBase : WindowBase
 {
+    /// <summary>
+    /// アイテムの画面モード
+    /// </summary>
+    public enum WindowMode
+    {
+        Normal = 0,
+        SetPotItem, // 壺にアイテムを入れるモード
+    }
+
     [Space(20)]
-
-    // 表示するアイテム数
-    protected const int SHOW_ITEM_NUM = 10;
-
-    // ページ数
-    [SerializeField] protected int _maxPage = 3;
 
     // ページャー
     [SerializeField] protected PagerControl _pager;
@@ -35,21 +38,26 @@ public class ItemWindowBase : WindowBase
     // ページごとに分かれたアイテム一覧 key:ページ value:アイテムリスト
     protected Dictionary<int, List<ItemData>> _itemDataDict = new Dictionary<int, List<ItemData>>();
 
+    // アイテムウィンドウの種類
+    protected ItemManager.ItemWindowType _windowType = ItemManager.ItemWindowType.None;
+
     // 現在のページ数
     int _currentPageIndex = 0;
+
+    // 現在の画面モード
+    public WindowMode CurrentWindowMode { get; set; }
+
+    // 選択中のアイテム
+    public ItemData SelectedItem { get; private set; }
 
     // 最大アイテム数
     public int MaxItemNum
     {
-        get { return SHOW_ITEM_NUM * _maxPage; }
+        get { return ItemManager.SHOW_ITEM_NUM * MaxPage; }
     }
 
     // ページ数
-    public int MaxPage
-    {
-        get { return _maxPage; }
-        set { _maxPage = value; }
-    }
+    public virtual int MaxPage { get; }
 
     // 現在のページ数
     public int CurrentPageIndex
@@ -69,6 +77,22 @@ public class ItemWindowBase : WindowBase
                 UpdateItemUI(_itemDataDict[_currentPageIndex]);
             }
         }
+    }
+
+    public override void OnEnable()
+    {
+        base.OnEnable();
+
+        ItemManager.Instance.OnAddItem += OnUpdateItem;
+        ItemManager.Instance.OnRemoveItem += OnUpdateItem;
+    }
+
+    public override void OnDisable()
+    {
+        base.OnDisable();
+
+        ItemManager.Instance.OnAddItem -= OnUpdateItem;
+        ItemManager.Instance.OnRemoveItem -= OnUpdateItem;
     }
 
     /// <summary>
@@ -94,7 +118,7 @@ public class ItemWindowBase : WindowBase
         navigationLayer.RemoveNavigatorAll();
 
         // 一覧作成
-        for (int i = 0; i < SHOW_ITEM_NUM; i++)
+        for (int i = 0; i < ItemManager.SHOW_ITEM_NUM; i++)
         {
             var obj = Instantiate(_itemCellPrefab, _contentsParent);
             obj.name = obj.name + "_" + i;
@@ -102,15 +126,17 @@ public class ItemWindowBase : WindowBase
 
             // アイテム情報の設定
             var itemCell = obj.GetComponent<ItemCell>();
-            itemCell.SetUIContents(_itemDataDict[CurrentPageIndex][i]);
+            if (_itemDataDict.ContainsKey(CurrentPageIndex) && i < _itemDataDict[CurrentPageIndex].Count)
+            {
+                itemCell.SetUIContents(_itemDataDict[CurrentPageIndex][i]);
+            }
+            else
+            {
+                itemCell.SetUIContents(null);
+            }
 
             // セルの選択時の処理を追加
-            itemCell.OnClickAction = data =>
-            {
-                // メニュー画面を表示
-                _itemMenuWindow.Open();
-                _itemMenuWindow.SetUp(data);
-            };
+            itemCell.OnClickAction = OnClickItemCell;
 
             // アイテム一覧に追加
             if (itemCell != null)
@@ -122,6 +148,9 @@ public class ItemWindowBase : WindowBase
         // セルの整列
         Canvas.ForceUpdateCanvases();
 
+        // ページャーの設定
+        SetUpPager();
+
         // ナビゲーターの設定
         SetUpNavigator();
 
@@ -130,12 +159,43 @@ public class ItemWindowBase : WindowBase
     }
 
     /// <summary>
+    /// アイテム選択時の処理
+    /// </summary>
+    /// <param name="data"></param>
+    public void OnClickItemCell(ItemData data)
+    {
+        switch (CurrentWindowMode)
+        {
+            case WindowMode.Normal:
+                // メニュー画面を表示
+                _itemMenuWindow.Open();
+                _itemMenuWindow.SetUp(this, data);
+
+                SelectedItem = data;
+                break;
+
+            case WindowMode.SetPotItem:
+                // 壺にアイテムを入れる
+                AddPutItem(data);
+                CurrentWindowMode = WindowMode.Normal;
+                break;
+        }
+    }
+
+    /// <summary>
     /// アイテムのUI更新(現在のページ)
     /// </summary>
     /// <param name="dataList"></param>
     public void UpdateCurrentPageItemUI()
     {
-        UpdateItemUI(_itemDataDict[CurrentPageIndex]);
+        if (_itemDataDict.ContainsKey(CurrentPageIndex))
+        {
+            UpdateItemUI(_itemDataDict[CurrentPageIndex]);
+        }
+        else
+        {
+            UpdateItemUI(null);
+        }
     }
 
     /// <summary>
@@ -144,108 +204,51 @@ public class ItemWindowBase : WindowBase
     /// <param name="dataList"></param>
     public void UpdateItemUI(List<ItemData> dataList)
     {
-        if (dataList == null || dataList.Count == 0)
-        {
-            return;
-        }
-
         // UIの更新
         for (int i = 0; i < _itemCellList.Count; i++)
         {
-            _itemCellList[i].SetUIContents(dataList[i]);
+            if(dataList != null && i < dataList.Count)
+            {
+                _itemCellList[i].SetUIContents(dataList[i]);
+            }
+            else
+            {
+                _itemCellList[i].SetUIContents(null);
+            }
         }
+
+        // ページャーの設定
+        SetUpPager();
 
         // ナビゲーターの設定
         SetUpNavigator();
     }
 
     /// <summary>
-    /// アイテムの追加
+    /// 壺にアイテムを追加
     /// </summary>
-    /// <param name="data">アイテムID</param>
-    /// <returns>結果</returns>
-    public bool AddItem(List<int> idList)
+    /// <param name="itemData"></param>
+    public void AddPutItem(ItemData itemData)
     {
-        // 追加するものがない
-        if (idList == null || idList.Count == 0)
+        // [選択中のアイテム]が壺系かどうか
+        // or
+        // 壺 in 壺 はだめなので[入れたいアイテム]が壺系ならアウト
+        if (SelectedItem.Type != ItemData.ItemType.Pot || itemData.Type == ItemData.ItemType.Pot)
         {
-            return false;
+            return;
         }
 
-        var itemList = new List<ItemData>();
+        var potItemList = SelectedItem.PotItemDataList;
 
-        foreach (var id in idList)
+        // アイテムがいっぱいなら入れれません
+        if (potItemList == null || potItemList.Count >= MaxItemNum)
         {
-            // idが存在するか確認
-            if (!ItemTableHelper.ContainsItemId(id))
-            {
-                Debug.LogError("ID = " + id + "のデータはマスタデータに存在しないです");
-                continue;
-            }
-
-            // マスタデータからアイテムの情報を取得する
-            itemList.Add(new ItemData(ItemTableHelper.MstItemData[id]));
+            return;
         }
 
-        // 追加できるものが何もない
-        if (itemList.Count == 0)
-        {
-            return false;
-        }
-
-        return AddItem(itemList);
-    }
-
-    /// <summary>
-    /// アイテムの追加
-    /// </summary>
-    /// <param name="data">アイテム</param>
-    /// <returns>結果</returns>
-    public bool AddItem(List<ItemData> dataList)
-    {
-        var itemList = GetDataList();
-
-        foreach (var data in dataList)
-        {
-            // アイテムが所持数制限を超えていれば追加しない
-            if (IsItemFull(itemList))
-            {
-                break;
-            }
-
-            // 空きがある場所にアイテムの情報を入れる
-            var index = itemList.FindIndex(_ => _.Id < 0);
-            itemList[index] = data;
-        }
-
-        // データをページごとに設定
-        SetData(itemList);
-
-        // アイテムのUIを更新
-        if (gameObject.activeSelf)
-        {
-            UpdateCurrentPageItemUI();
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// アイテムがいっぱいかどうか
-    /// </summary>
-    /// <returns></returns>
-    public bool IsItemFull(List<ItemData> itemList = null)
-    {
-        itemList = itemList == null ? GetDataList() : itemList;
-
-        // 一つでも空きがあればfalse
-        if (itemList == null || itemList.Any(data => data.Id < 0))
-        {
-            return false;
-        }
-
-        Debug.LogError("アイテムがいっぱいです。");
-        return true;
+        // 壺にアイテムを入れる
+        potItemList.Add(itemData);
+        ItemManager.Instance.RemoveItem(ItemManager.Instance.CurrentWindowType, itemData);
     }
 
     /// <summary>
@@ -271,23 +274,9 @@ public class ItemWindowBase : WindowBase
         // アイテムデータを一つのリストにする
         List<ItemData> itemDatalist = new List<ItemData>();
 
-        for (int page = 0; page < MaxPage; page++)
+        foreach (var datas in _itemDataDict.Values)
         {
-            for (int select = 0; select < SHOW_ITEM_NUM; select++)
-            {
-                try
-                {
-                    // データがあるものだけリストに追加
-                    if (_itemDataDict[page][select] != null)
-                    {
-                        itemDatalist.Add(_itemDataDict[page][select]);
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
-            }
+            itemDatalist.AddRange(datas);
         }
 
         // 一つのリスト化にしたものを返す
@@ -298,29 +287,54 @@ public class ItemWindowBase : WindowBase
     /// 一つにまとめたデータをページごとに分ける
     /// </summary>
     /// <param name="datas"></param>
-    protected void SetData(List<ItemData> datas)
+    protected void SetData(IEnumerable<ItemData> datas)
     {
-        // ソートしたデータを_itemDataDictに戻す
-        for (int i = 0; i < MaxPage; i++)
+        // ディクショナリを初期化
+        _itemDataDict.Clear();
+
+        // データを ItemManager.SHOW_ITEM_NUM の数づつ_itemDataDictに入れる
+        var pageCount = 0;
+        while (datas.Any())
         {
-            var dataList = new List<ItemData>();
+            // Take()で指定数づつ取得
+            _itemDataDict.Add(pageCount, datas.Take(ItemManager.SHOW_ITEM_NUM).ToList());
 
-            for (int j = 0; j < SHOW_ITEM_NUM; j++)
+            // Skip()で指定分ずらす
+            datas = datas.Skip(ItemManager.SHOW_ITEM_NUM);
+
+            pageCount++;
+        }
+    }
+
+    /// <summary>
+    /// アイテムの更新用コールバック
+    /// </summary>
+    public virtual void OnUpdateItem()
+    {
+        // アイテム情報を更新
+        SetData(ItemManager.Instance.GetPlayerItemList(ItemManager.Instance.CurrentWindowType));
+
+        // UIの更新
+        UpdateCurrentPageItemUI();
+    }
+
+    /// <summary>
+    /// ページャーの設定
+    /// </summary>
+    private void SetUpPager()
+    {
+        // ページャーの設定
+        var pageNum = _itemDataDict.Count;
+        if (pageNum != _pager.GetCount())
+        {
+            if (pageNum >= CurrentPageIndex)
             {
-                // 取得したデータの中身がなくてもリストは用意する
-                if (datas != null && (j + SHOW_ITEM_NUM * i) < datas.Count)
-                {
-                    dataList.Add(datas[j + (SHOW_ITEM_NUM * i)]);
-                }
-                else
-                {
-                    dataList.Add(new ItemData(null));
-                    continue;
-                }
+                _pager.Init(pageNum, CurrentPageIndex);
             }
-
-            // ディクショナリに差し替え
-            _itemDataDict[i] = dataList;
+            else
+            {
+                _pager.Init(pageNum, pageNum);
+            }
         }
     }
 
@@ -368,7 +382,7 @@ public class ItemWindowBase : WindowBase
                 break;
 
             case NavigationManager.InputDirection.Right:
-                if (CurrentPageIndex + 1 <= MaxPage)
+                if (CurrentPageIndex + 1 <= _pager.GetCount())
                 {
                     CurrentPageIndex++;
                 }
@@ -380,11 +394,15 @@ public class ItemWindowBase : WindowBase
     #region サブメニュー関係
 
     /// <summary>
-    /// サブメニューを選択した時の処理
+    /// 壺にアイテムを入れる
     /// </summary>
-    public void OnSelectSubMenu()
+    public void OnSelectSetPotItem()
     {
-        // 選択中のコマンドを実行
+        // ウィンドウの画面モードを変更
+        CurrentWindowMode = WindowMode.SetPotItem;
+
+        // UIの更新があれば追記
+
 
     }
 

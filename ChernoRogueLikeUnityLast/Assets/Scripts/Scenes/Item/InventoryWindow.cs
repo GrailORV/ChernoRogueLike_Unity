@@ -10,6 +10,8 @@ public class InventoryWindow : ItemWindowBase
 {
     public override void SetUp()
     {
+        ItemManager.Instance.CurrentWindowType = ItemManager.ItemWindowType.Inventory;
+
         // ページャーの初期化
         _pager.Init(MaxPage);
 
@@ -19,11 +21,8 @@ public class InventoryWindow : ItemWindowBase
         // アイテム情報の更新
         SetData(GetDataList());
 
-        ItemTableHelper.Load();
-        AddItem(new List<int>() { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-
         // アイテム一覧ないなら作成
-        if (_itemCellList == null || _itemCellList.Count != SHOW_ITEM_NUM)
+        if (_itemCellList == null || _itemCellList.Count != ItemManager.SHOW_ITEM_NUM)
         {
             CreateItemCell();
         }

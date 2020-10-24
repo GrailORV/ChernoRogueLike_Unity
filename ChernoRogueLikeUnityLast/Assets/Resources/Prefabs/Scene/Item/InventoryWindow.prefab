@@ -893,6 +893,8 @@ MonoBehaviour:
   _animPlayTime: 0.3
   _animDelayTime: 0
   _tweenType: 0
+  _useSubCanvas: 0
+  _sortOrder: 0
   navigationLayer: {fileID: 114359026305260970}
   _isDefaultInput: 1
   _menuList:
@@ -1051,6 +1053,8 @@ MonoBehaviour:
   _animPlayTime: 0.3
   _animDelayTime: 0
   _tweenType: 1
+  _useSubCanvas: 1
+  _sortOrder: 10
   navigationLayer: {fileID: 114453757468783100}
   _isDefaultInput: 1
   _maxPage: 10
