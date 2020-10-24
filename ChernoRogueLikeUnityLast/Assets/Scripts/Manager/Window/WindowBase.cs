@@ -198,6 +198,15 @@ public class WindowBase : MonoBehaviour
     }
 
     /// <summary>
+    /// ウィンドウタイプの取得
+    /// </summary>
+    /// <returns></returns>
+    public WindowData.WindowType GetWindowType()
+    {
+        return WindowManager.Instance.GetWindowType(this);
+    }
+
+    /// <summary>
     /// 削除時
     /// </summary>
     void OnDestroy()

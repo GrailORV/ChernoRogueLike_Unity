@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -120,6 +121,21 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
         }
 
         return instance;
+    }
+
+    /// <summary>
+    /// ウィンドウタイプの取得
+    /// </summary>
+    /// <param name="window"></param>
+    /// <returns></returns>
+    public WindowData.WindowType GetWindowType(WindowBase window)
+    {
+        if (_windowDict.ContainsValue(window))
+        {
+            return _windowDict.FirstOrDefault(w => w.Value == window).Key;
+        }
+
+        return WindowData.WindowType.None;
     }
 
     /// <summary>

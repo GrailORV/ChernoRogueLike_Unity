@@ -7,6 +7,8 @@ public static class WindowData
 {
 	public enum WindowType
 	{
+        None,
+
 		InventoryWindow,
 		ItemDescriptionWindow,
 		ItemWindow,

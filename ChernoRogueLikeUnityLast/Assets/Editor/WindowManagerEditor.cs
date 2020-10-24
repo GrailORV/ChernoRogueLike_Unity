@@ -128,7 +128,9 @@ public class WindowManagerEditor : MonoBehaviour
         // enum作成
         builder.AppendLine("\tpublic enum WindowType");
         builder.AppendLine("\t{");
-        foreach(var key in dict.Keys)
+        builder.AppendLine(("\t\t" + "None,")).AppendLine();
+
+        foreach (var key in dict.Keys)
         {
             builder.AppendLine(("\t\t" + key + ","));
         }
