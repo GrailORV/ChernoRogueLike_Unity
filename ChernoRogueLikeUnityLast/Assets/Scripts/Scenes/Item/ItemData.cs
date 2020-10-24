@@ -24,10 +24,36 @@ public class ItemData
     /// <summary> 説明 </summary>
     public string Description { get; set; }
 
+    private List<ItemData> _potItemDataList;
     /// <summary> ツボのアイテム情報 </summary>
-    public List<ItemData> potItemDataList { get; set; }
+    public List<ItemData> PotItemDataList
+    {
+        get
+        {
+            if (Type != ItemType.Pot)
+            {
+                return null;
+            }
 
-    public ItemData(ItemTableData.Data data)
+            if (_potItemDataList == null)
+            {
+                _potItemDataList = new List<ItemData>();
+            }
+
+            return _potItemDataList;
+        }
+        set
+        {
+            if (Type != ItemType.Pot)
+            {
+                return;
+            }
+
+            _potItemDataList = value;
+        }
+    }
+
+    public ItemData(ItemTableData.Data data = null)
     {
         if (data == null)
         {
@@ -39,22 +65,21 @@ public class ItemData
         Type = (ItemType)data.type;
         Name = data.name;
         Description = data.Description;
+    }
 
-        switch (Type)
+    /// <summary>
+    /// データの初期化
+    /// </summary>
+    public void Init()
+    {
+        Id = -1;
+        Type = ItemType.None;
+        Name = string.Empty;
+        Description = string.Empty;
+
+        if (PotItemDataList != null)
         {
-            case ItemType.None:
-                break;
-            case ItemType.Wepon:
-                break;
-            case ItemType.armor:
-                break;
-            case ItemType.Food:
-                break;
-            case ItemType.Pot:
-                potItemDataList = new List<ItemData>();
-                break;
-            default:
-                break;
+            PotItemDataList.Clear();
         }
     }
 }

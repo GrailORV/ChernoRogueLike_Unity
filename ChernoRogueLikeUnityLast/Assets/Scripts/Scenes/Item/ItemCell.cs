@@ -32,7 +32,7 @@ public class ItemCell: MonoBehaviour
     public bool IsEmpty { get; private set; }
 
     // UIの管理用オブジェクト
-    [SerializeField] GameObject _contentsRoot;
+    [SerializeField] GameObject _contentsRoot = null;
 
     // 入力時の処理
     public Action<ItemData> OnClickAction;
@@ -53,6 +53,11 @@ public class ItemCell: MonoBehaviour
         // アイテムあるかどうか
         IsEmpty = _itemData == null || _itemData.Id < 0;
         ShowItem(!IsEmpty);
+
+        if(IsEmpty)
+        {
+            return;
+        }
 
         // データに沿って情報の設定
         NameText.text = _itemData.Name;

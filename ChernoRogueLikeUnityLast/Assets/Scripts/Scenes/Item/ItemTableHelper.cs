@@ -15,6 +15,11 @@ public static class ItemTableHelper
     /// </summary>
     public static void Load()
     {
+        if (MstItemData != null)
+        {
+            return;
+        }
+
         var dataList = Resources.Load<ItemTableData>("MasterData/ItemTable").dataList;
 
         // リストディクショナリに変換する

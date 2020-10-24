@@ -174,7 +174,6 @@ public class Navigator : MonoBehaviour
     /// <param name="inputManager"></param>
     void CheckButtonAction(KeyCommand command, InputControllerManager inputManager)
     {
-        var result = false;
         var key = Controller.Button.Button_2;
 
         if (command.target == null || string.IsNullOrEmpty(command.methodName))
