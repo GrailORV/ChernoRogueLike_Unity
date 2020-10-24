@@ -267,6 +267,8 @@ MonoBehaviour:
   _animPlayTime: 0.3
   _animDelayTime: 0
   _tweenType: 1
+  _useSubCanvas: 1
+  _sortOrder: 20
   navigationLayer: {fileID: 114060995699539596}
   _isDefaultInput: 1
   _iconImage: {fileID: 114939339241763718}
