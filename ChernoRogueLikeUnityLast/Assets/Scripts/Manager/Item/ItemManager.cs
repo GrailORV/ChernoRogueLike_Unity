@@ -1,11 +1,47 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
+using System.Linq;
 
 public class ItemManager : SingletonMonoBehaviour<ItemManager>
 {
-    /*
+    /// <summary>
+    /// アイテム画面の種類
+    /// </summary>
+    public enum ItemWindowType
+    {
+        None = -1,
+
+        Item,       // 所持アイテム
+        Inventory,  // 倉庫
+        Shop,       // ショップ
+
+        Max,
+    }
+
+    // 表示するアイテム数
+    public const int SHOW_ITEM_NUM = 10;
+
+    // アイテムの最大ページ数
+    public const int MAX_PAGE_NUM_POT       =    1;    // 壺
+    public const int MAX_PAGE_NUM_ITEM      =    3;    // 所持品
+    public const int MAX_PAGE_NUM_INVENTORY =   10;    // 倉庫
+    public const int MAX_PAGE_NUM_SHOP      =    1;    // ショップ
+
+    // プレイヤーのアイテム用ディクショナリ
+    private Dictionary<ItemWindowType, List<ItemData>> _playerItemDataDict = new Dictionary<ItemWindowType, List<ItemData>>();
+
+    // 現在開いているアイテム画面
+    public ItemWindowType CurrentWindowType { get; set; }
+
+    // アイテムが追加されたときに呼ばれるコールバック
+    public event Action OnAddItem;
+
+    // アイテムが削除されたときに呼ばれるコールバック
+    public event Action OnRemoveItem;
+
+
     /// <summary>
     /// Instance生成時に呼ばれる処理
     /// </summary>
@@ -13,205 +49,288 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     {
         base.Awake();
 
-        // アイテムのマスターデータの取得
-        //_mstItemData = ItemDataModifier.GetMstItemData();
-
-        // 全キャラクターのアイテム情報を取得
-        // TODO ID管理と仮定しているので変更の可能性あり…現状はプレイヤーのみ
-        //var dataList = ItemDataModifier.ReadItemData();
-        //_itemDataDict.Add(0, dataList);
+        // 初期化
+        Init();
     }
 
     /// <summary>
-    /// アイテム情報の取得
+    /// 初期化
     /// </summary>
-    /// <param name="charaId"></param>
-    /// <returns></returns>
-    public List<ItemData> GetItemData(int charaId)
+    void Init()
     {
-        // 指定したキャラIDのアイテムリストが存在するかどうか
-        if(!_itemDataDict.ContainsKey(charaId))
-        {
-            Debug.LogError("<color=red>charaIDが[" + charaId + "]のアイテムリストが存在しません</color>");
-            return null;
-        }
+        // マスタデータの読み込み
+        ItemTableHelper.Load();
 
-        return _itemDataDict[charaId];
+        // アイテム情報の読み込み
+        Load();
     }
 
     /// <summary>
-    /// アイテムの追加
+    /// アイテム情報のセーブ
     /// </summary>
-    /// <param name="charaId">キャラID</param>
-    /// <param name="data">アイテムID</param>
-    /// <returns>結果</returns>
-    public bool AddItem(int charaId, int itemId)
+    public void Save()
     {
-        // マスタデータが存在するか
-        if (_mstItemData == null)
-        {
-            Debug.LogError("<color=red>アイテムのマスタデータがないので追加できません</color>");
-            return false;
-        }
 
-        // idが存在するか確認
-        if (!_mstItemData.ContainsKey(itemId))
-        {
-            Debug.LogError("<color=red>ID = " + itemId + "のデータはマスタデータに存在しないです</color>");
-            return false;
-        }
-
-        // マスタデータからアイテムの情報を取得する
-        var data = _mstItemData[itemId];
-        return AddItem(charaId, data);
     }
 
     /// <summary>
-    /// アイテムの追加
+    /// アイテム情報のロード
     /// </summary>
-    /// <param name="charaId">キャラID</param>
-    /// <param name="data">アイテムの情報</param>
-    /// <returns>結果</returns>
-    public bool AddItem(int charaId, ItemData data)
+    public void Load()
     {
-        bool result = false;
+        // まだロード処理内からただの初期化
+        _playerItemDataDict.Clear();
 
-        // キャラクターが存在するか
-        if (!_itemDataDict.ContainsKey(charaId))
+        foreach (ItemWindowType key in Enum.GetValues(typeof(ItemWindowType)))
         {
-            Debug.LogError("<color=red>charaIDが[" + charaId + "]のアイテムリストが存在しません</color>");
-            return result;
-        }
-
-        // データが存在するか
-        if (data == null)
-        {
-            Debug.LogError("<color=red>追加したいデータが存在しません</color>");
-            return result;
-        }
-
-        // 該当するキャラにアイテムを追加
-        var dataList = _itemDataDict[charaId];
-        for (int i = 0; i < MAX_ITEM; i++)
-        {
-            // 空きがあるか確認
-            if(0 < dataList[i].Id)
+            if (key == ItemWindowType.None || key == ItemWindowType.Max)
             {
                 continue;
             }
 
-            // アイテム追加
-            dataList[i] = data;
-            result = true;
-            break;
+            _playerItemDataDict.Add(key, new List<ItemData>());
         }
-
-        // UIの更新
-        return result;
     }
 
     /// <summary>
-    /// アイテムの削除
+    /// プレイヤーのアイテムを取得する
     /// </summary>
-    /// <param name="charaId">キャラID</param>
-    /// <param name="itemId">アイテムID</param>
+    /// <param name="type"></param>
     /// <returns></returns>
-    public bool DeleteItem(int charaId, int itemId)
+    public List<ItemData> GetPlayerItemList(ItemWindowType type)
     {
-        // マスタデータが存在するか
-        if (_mstItemData == null)
+        if (type == ItemWindowType.None || type == ItemWindowType.Max)
         {
-            Debug.LogError("<color=red>アイテムのマスタデータがないので追加できません</color>");
-            return false;
+            Debug.LogError("指定する ItemWindowType が「" + type + "」です");
+            return null;
+        }
+        if (!_playerItemDataDict.ContainsKey(type))
+        {
+            Debug.LogErrorFormat("「{0}」のキーがDisctionaryに追加されていません", type);
+            return null;
+        }
+        if (_playerItemDataDict[type] == null)
+        {
+            Debug.LogErrorFormat("「{0}」のアイテムリストが null です", type);
+            return null;
         }
 
-        // idが存在するか確認
-        if (!_mstItemData.ContainsKey(itemId))
-        {
-            Debug.LogError("<color=red>ID = " + itemId + "のデータはマスタデータに存在しないです</color>");
-            return false;
-        }
-
-        // マスタデータからアイテムの情報を取得する
-        var data = _mstItemData[itemId];
-        return DeleteItem(charaId, data);
+        return _playerItemDataDict[type];
     }
 
     /// <summary>
-    /// アイテムの削除
+    /// アイテムがいっぱいかどうか
     /// </summary>
-    /// <param name="charaId">キャラID</param>
-    /// <param name="data">アイテムの情報</param>
-    /// <returns>結果</returns>
-    public bool DeleteItem(int charaId, ItemData data)
-    {
-        bool result = false;
-
-        // キャラクターが存在するか
-        if (!_itemDataDict.ContainsKey(charaId))
-        {
-            Debug.LogError("<color=red>charaIDが[" + charaId + "]のアイテムリストが存在しません</color>");
-            return result;
-        }
-
-        // データが存在するか
-        if (data == null)
-        {
-            Debug.LogError("<color=red>削除したいデータが存在しません</color>");
-            return result;
-        }
-
-        // 該当するキャラのアイテムを削除
-        var dataList = _itemDataDict[charaId];
-        result = dataList.Remove(data);
-
-        if(!result)
-        {
-            Debug.LogError("<color=red>削除したいデータを所持していません</color>");
-            return result;
-        }
-
-        // 空のデータを追加
-        //dataList.Add(new ItemData());
-        return result;
-    }
-
-    /// <summary>
-    /// プレイヤーのアイテム追加
-    /// </summary>
+    /// <param name="type"></param>
     /// <returns></returns>
-    public bool AddPlayerItem(int itemId)
+    public bool CheckItemFull(ItemWindowType type)
     {
-        return AddItem(0, itemId);
+        var maxPageNum = 0;
+
+        switch (type)
+        {
+            case ItemWindowType.Item:
+                maxPageNum = MAX_PAGE_NUM_ITEM;
+                break;
+
+            case ItemWindowType.Inventory:
+                maxPageNum = MAX_PAGE_NUM_INVENTORY;
+                break;
+
+            case ItemWindowType.Shop:
+                maxPageNum = MAX_PAGE_NUM_SHOP;
+                break;
+
+            default:
+                return false;
+        }
+
+        var itemList = GetPlayerItemList(type);
+        return itemList.Count >= SHOW_ITEM_NUM * maxPageNum;
     }
 
     /// <summary>
-    /// プレイヤーのアイテム追加
+    /// アイテムの追加(id)
     /// </summary>
-    /// <returns></returns>
-    public bool AddPlayerItem(ItemData data)
-    {
-        return AddItem(0, data);
-    }
-
-    /// <summary>
-    /// プレイヤーのアイテム削除
-    /// </summary>
+    /// <param name="type"></param>
     /// <param name="itemId"></param>
+    /// <param name="isCallBack"></param>
     /// <returns></returns>
-    public bool DeletePlayerItem(int itemId)
+    public bool AddItem(ItemWindowType type, int itemId, bool isCallBack = true)
     {
-        return DeleteItem(0, itemId);
+        // idからアイテムの情報を取得
+        if (!ItemTableHelper.ContainsItemId(itemId))
+        {
+            Debug.LogError("id = " + itemId + " のアイテムはテーブルに存在していません");
+            return false;
+        }
+
+
+        return AddItem(type, new ItemData(ItemTableHelper.GetItemData(itemId)), isCallBack);
     }
 
     /// <summary>
-    /// プレーヤーのアイテム削除
+    /// アイテムの追加(id)(複数)
     /// </summary>
+    /// <param name="type"></param>
+    /// <param name="idList"></param>
+    /// <returns></returns>
+    public bool AddItem(ItemWindowType type, IReadOnlyList<int> idList)
+    {
+        if (idList == null)
+        {
+            Debug.LogError("追加したいアイテムのidリストが null です");
+            return false;
+        }
+
+        var result = false;
+
+        foreach (var id in idList)
+        {
+            result = AddItem(type, id, false);
+
+            // 失敗した時点で終了
+            if (!result)
+            {
+                break;
+            }
+        }
+
+        OnAddItem.SafeInvoke();
+
+        return result;
+    }
+
+    /// <summary>
+    /// アイテムの追加
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="itemData"></param>
+    /// <returns></returns>
+    public bool AddItem(ItemWindowType type, ItemData itemData, bool isCallBack = true)
+    {
+        if (itemData == null)
+        {
+            Debug.LogError("追加したいアイテムのデータが null です");
+            return false;
+        }
+
+        // いっぱいでなければ入れる
+        if (CheckItemFull(type))
+        {
+            return false;
+        }
+
+        var itemList = GetPlayerItemList(type);
+        itemList.Add(itemData);
+
+        if (isCallBack)
+        {
+            OnAddItem.SafeInvoke();
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// アイテムの追加(複数)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="itemDataList"></param>
+    /// <returns></returns>
+    public bool AddItem(ItemWindowType type, IReadOnlyList<ItemData> itemDataList)
+    {
+        if (itemDataList == null)
+        {
+            Debug.LogError("追加したいアイテムのデータリストが null です");
+            return false;
+        }
+
+        var result = false;
+
+        foreach (var data in itemDataList)
+        {
+            result = AddItem(type, data, false);
+
+            // 失敗した時点で終了
+            if(!result)
+            {
+                break;
+            }
+        }
+
+        OnAddItem.SafeInvoke();
+
+        return result;
+    }
+
+    /// <summary>
+    /// アイテムの削除
+    /// </summary>
+    /// <param name="type"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public bool DeletePlayerItem(ItemData data)
+    public bool RemoveItem(ItemWindowType type, ItemData itemData, bool isCallBack = true)
     {
-        return DeleteItem(0, data);
+        if (itemData == null)
+        {
+            Debug.LogError("削除したいアイテムのデータが null です");
+            return false;
+        }
+
+        var result = false;
+        var itemList = GetPlayerItemList(type);
+
+        for (int i = 0; i < itemList.Count; i++)
+        {
+            var data = itemList[i];
+
+            // 該当するデータの場合は削除
+            if (data == itemData)
+            {
+                itemList.Remove(itemData);
+                result = true;
+                break;
+            }
+        }
+
+        if (isCallBack)
+        {
+            OnRemoveItem.SafeInvoke();
+        }
+
+        return result;
     }
-    */
+
+    /// <summary>
+    /// アイテムの削除(複数)
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="itemDataList"></param>
+    /// <returns></returns>
+    public bool RemoveItem(ItemWindowType type, IReadOnlyList<ItemData> itemDataList)
+    {
+        if (itemDataList == null)
+        {
+            Debug.LogError("削除したいアイテムのデータリストが null です");
+            return false;
+        }
+
+        var result = false;
+
+        foreach (var data in itemDataList)
+        {
+            result = RemoveItem(type, data);
+
+            // 失敗した時点で終了
+            if (!result)
+            {
+                break;
+            }
+        }
+
+        OnRemoveItem.SafeInvoke();
+
+        return result;
+    }
 }
