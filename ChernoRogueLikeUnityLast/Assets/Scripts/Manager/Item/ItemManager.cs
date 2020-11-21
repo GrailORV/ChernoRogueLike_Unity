@@ -119,6 +119,27 @@ public class ItemManager : SingletonMonoBehaviour<ItemManager>
     }
 
     /// <summary>
+    /// アイテムを直接設定する
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="itemDataList"></param>
+    public void SetPlayerItemList(ItemWindowType type, List<ItemData> itemDataList)
+    {
+        if (type == ItemWindowType.None || type == ItemWindowType.Max)
+        {
+            Debug.LogError("指定する ItemWindowType が「" + type + "」です");
+            return;
+        }
+        if (!_playerItemDataDict.ContainsKey(type))
+        {
+            Debug.LogErrorFormat("「{0}」のキーがDisctionaryに追加されていません", type);
+            return;
+        }
+
+        _playerItemDataDict[type] = itemDataList;
+    }
+
+    /// <summary>
     /// アイテムがいっぱいかどうか
     /// </summary>
     /// <param name="type"></param>

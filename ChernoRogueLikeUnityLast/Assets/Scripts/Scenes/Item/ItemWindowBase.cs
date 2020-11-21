@@ -261,8 +261,18 @@ public class ItemWindowBase : WindowBase
         if (dataList != null)
         {
             // ID順のソートを行う
-            dataList.OrderBy(data => data.Id);
+            dataList = dataList.OrderBy(data => data.Id).ToList();
         }
+
+        if (_windowType != ItemManager.ItemWindowType.None && _windowType != ItemManager.ItemWindowType.Max)
+        {
+            ItemManager.Instance.SetPlayerItemList(_windowType, dataList);
+        }
+
+        SetData(dataList);
+
+        // UIの更新
+        UpdateCurrentPageItemUI();
     }
 
     /// <summary>
