@@ -251,6 +251,9 @@ public class ItemMenuWindow : WindowBase
     {
         Debug.Log("説明するよ");
 
+        // カーソル位置を保存しておく
+        navigationLayer.SetDefaultIndex(navigationLayer.GetCurrentIndex());
+
         var descriptionWindow = WindowManager.Instance.CreateAndOpenWindow<ItemDescriptionWindow>(WindowData.WindowType.ItemDescriptionWindow);
         descriptionWindow.SetUp(_itemData);
     }
