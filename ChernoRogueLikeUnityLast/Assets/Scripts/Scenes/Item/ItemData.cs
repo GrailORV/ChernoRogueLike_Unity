@@ -1,26 +1,85 @@
-﻿public class ItemData
+﻿using System.Collections;
+using System.Collections.Generic;
+
+public class ItemData
 {
-    /// <summary> ID </summary>
-    int _id = -1;
-    public int Id
+    public enum ItemType
     {
-        get { return _id; }
-        set { _id = value; }
+        None = 0,
+        Wepon,
+        armor,
+        Food,
+        Pot,
     }
+
+    /// <summary> ID </summary>
+    public int Id { get; set; }
 
     /// <summary> 種類 </summary>
-    string _type = "";
-    public string Type
-    {
-        get { return _type; }
-        set { _type = value; }
-    }
+    public ItemType Type { get; set; }
 
     /// <summary> 名前 </summary>
-    string _name = "";
-    public string Name
+    public string Name { get; set; }
+
+    /// <summary> 説明 </summary>
+    public string Description { get; set; }
+
+    private List<ItemData> _potItemDataList;
+    /// <summary> ツボのアイテム情報 </summary>
+    public List<ItemData> PotItemDataList
     {
-        get { return _name; }
-        set { _name = value; }
+        get
+        {
+            if (Type != ItemType.Pot)
+            {
+                return null;
+            }
+
+            if (_potItemDataList == null)
+            {
+                _potItemDataList = new List<ItemData>();
+            }
+
+            return _potItemDataList;
+        }
+        set
+        {
+            if (Type != ItemType.Pot)
+            {
+                return;
+            }
+
+            _potItemDataList = value;
+        }
+    }
+
+    public ItemData(ItemTableData.Data data = null)
+    {
+        if (data == null)
+        {
+            Id = -1;
+            return;
+        }
+
+        Id = data.id;
+        Type = (ItemType)data.type;
+        Name = data.name;
+        Description = data.Description;
+    }
+
+    /// <summary>
+    /// データの初期化
+    /// </summary>
+    public void Init()
+    {
+        Id = -1;
+        Type = ItemType.None;
+        Name = string.Empty;
+        Description = string.Empty;
+
+        if (PotItemDataList != null)
+        {
+            PotItemDataList.Clear();
+        }
     }
 }

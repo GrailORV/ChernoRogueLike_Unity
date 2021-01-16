@@ -67,6 +67,8 @@ public class PagerControl : MonoBehaviour
             }
         }
 
+        _pagerList.Clear();
+
         // ページャーを作成
         for (int i = 0; i < pagerNum; i++)
         {
@@ -123,5 +125,14 @@ public class PagerControl : MonoBehaviour
                 icon.color = Color.gray;
             }
         }
+    }
+
+    /// <summary>
+    /// 表示しているページャーの数を取得
+    /// </summary>
+    /// <returns></returns>
+    public int GetCount()
+    {
+        return _pagerList == null ? 0 : _pagerList.Count;
     }
 }

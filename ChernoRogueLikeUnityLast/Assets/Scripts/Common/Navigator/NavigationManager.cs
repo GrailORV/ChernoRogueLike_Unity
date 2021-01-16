@@ -91,11 +91,8 @@ public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
         // キーの初期化
         _inputManager = new InputControllerManager();
 
-        // キーボードのキーの割り当て
-        //_inputManager.SetForKeyboard();
-
-        // コントローラーのキーの割り当て
-        _inputManager.SetDefaultButton();
+        // キーの割り当て
+        _inputManager.SetDefaultButtonAndKeyboard();
     }
 
     void Update()
@@ -212,9 +209,13 @@ public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
             CurrentLayer = _highLayerList.Last();
         }
         // 通常のレイヤーリストから設定
-        else
+        else if (_layerList.Count > 0)
         {
             CurrentLayer = _layerList.Last();
+        }
+        else
+        {
+            CurrentLayer = null;
         }
     }
 }

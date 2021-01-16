@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemCell: MonoBehaviour
 {
     // レクとトランスフォーム
-    [SerializeField] RectTransform _rectTransform = null;
+    [SerializeField] RectTransform _rectTransform;
     public RectTransform RectTransform
     {
         get { return _rectTransform; }
@@ -12,7 +13,7 @@ public class ItemCell: MonoBehaviour
     }
 
     // 名前用のテキスト
-    [SerializeField] Text _nameText = null;
+    [SerializeField] Text _nameText;
     public Text NameText
     {
         get { return _nameText; }
@@ -20,45 +21,67 @@ public class ItemCell: MonoBehaviour
     }
 
     // サムネ用の画像
-    [SerializeField] Image _sumbnailImage = null;
+    [SerializeField] Image _sumbnailImage;
     public Image Sumbnail
     {
         get { return _sumbnailImage; }
         set { _sumbnailImage = value; }
     }
 
+    // データが無い状態かどうか
+    public bool IsEmpty { get; private set; }
+
+    // UIの管理用オブジェクト
+    [SerializeField] GameObject _contentsRoot = null;
+
+    // 入力時の処理
+    public Action<ItemData> OnClickAction;
+
+    // アイテムの情報
+    ItemData _itemData;
+
     /// <summary>
     /// UIの設定
     /// </summary>
     public void SetUIContents(ItemData data)
     {
-        if(data == null)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
-        if (data.Id < 0)
-        {
-            gameObject.SetActive(false);
-            return;
-        }
+        _itemData = data;
 
-        // TODO まだ名前のみ
-        _nameText.text = data.Name;
-
-        // 表示
+        // オブジェクトは必ず表示
         gameObject.SetActive(true);
+
+        // アイテムあるかどうか
+        IsEmpty = _itemData == null || _itemData.Id < 0;
+        ShowItem(!IsEmpty);
+
+        if(IsEmpty)
+        {
+            return;
+        }
+
+        // データに沿って情報の設定
+        NameText.text = _itemData.Name;
+        Sumbnail.gameObject.SetActive(true);
     }
 
     /// <summary>
-    /// 削除されたとき呼ばれる
+    /// アイテムの表示状態の設定
     /// </summary>
-    void OnDestroy()
+    public void ShowItem(bool show)
     {
-        // 保持していた変数の初期化
-        _rectTransform = null;
-        _nameText = null;
-        _sumbnailImage.sprite = null;
-        _sumbnailImage = null;
+        _contentsRoot.SetActive(show);
+    }
+
+    /// <summary>
+    /// セルを選択した時の処理
+    /// </summary>
+    public void OnClickCell()
+    {
+        if (_itemData == null || OnClickAction == null)
+        {
+            return;
+        }
+
+        OnClickAction.SafeInvoke(_itemData);
     }
 }

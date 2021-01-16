@@ -38,7 +38,7 @@ public class AxisState
     public double Sensitivity { get { return _seneitivity; } set { Sensitivity = value; } }
 
     // 重力
-    double _gravity = 10;
+    double _gravity = 0;
     public double Gravity { get { return _gravity; } set { _gravity = value; } }
 
     // 無反応
@@ -195,6 +195,9 @@ public class AxisState
                 {
                     _nowState = axis;
                 }
+
+                // 値を -1 ～ 1 にする
+                _nowState = Mathf.Clamp(_nowState, -1, 1);
                 codeCount++;
             }
 

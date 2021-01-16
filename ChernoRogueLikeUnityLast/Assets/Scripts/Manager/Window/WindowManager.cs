@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -8,16 +9,27 @@ using UnityEngine;
 /// このクラスで行えるようにする。これで、参照させる負担やまとめて処理などを
 /// 行えるようにする（すべてのウィンドウを閉じるなど→実装するかはわからんが…）
 /// </summary>
+[RequireComponent(typeof(Canvas))]
+[RequireComponent(typeof(RectTransform))]
 public class WindowManager : SingletonMonoBehaviour<WindowManager>
 {
+    // Root用のキャンバスオブジェクトのPath
+    static readonly string WINDOW_ROOT_CANVAS_PATH = "Prefabs/Manager/Window/RootCanvas";
+
     // ウィンドウのキャッシュ用のディクショナリ
     // key:WindowData.WindowType → ウィンドウのタイプ
     // value:WindowBase →　WindowBaseクラス
     Dictionary<WindowData.WindowType, WindowBase> _windowDict = new Dictionary<WindowData.WindowType, WindowBase>();
 
+    // Root用のキャンバス
+    Canvas _rootCanvas;
+
     protected override void Awake()
     {
         base.Awake();
+
+        // シーン遷移時オブジェクトは削除されない
+        DontDestroyOnLoad(gameObject);
     }
 
     /// <summary>
@@ -41,9 +53,15 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
         // ディクショナリにあるか確認
         if(WindowData.WindowPathDict.ContainsKey(type))
         {
+            // 親となるキャンバスが無ければ生成
+            if (_rootCanvas == null)
+            {
+                CreateRootCanvas();
+            }
+
             // ウィンドウの生成
             var obj = Resources.Load(WindowData.WindowPathDict[type]);
-            var window = Instantiate(obj, transform) as GameObject;
+            var window = Instantiate(obj, _rootCanvas.transform) as GameObject;
             window.name = obj.name;
 
             // インスタンスの取得
@@ -73,13 +91,15 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="type"></param>
-    public void CreateAndOpenWindow<T>(WindowData.WindowType type) where T : WindowBase
+    public T CreateAndOpenWindow<T>(WindowData.WindowType type) where T : WindowBase
     {
         var window = CreateWindow<T>(type);
         if(window != null)
         {
             window.Open();
         }
+
+        return window;
     }
 
     /// <summary>
@@ -104,6 +124,21 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
     }
 
     /// <summary>
+    /// ウィンドウタイプの取得
+    /// </summary>
+    /// <param name="window"></param>
+    /// <returns></returns>
+    public WindowData.WindowType GetWindowType(WindowBase window)
+    {
+        if (_windowDict.ContainsValue(window))
+        {
+            return _windowDict.FirstOrDefault(w => w.Value == window).Key;
+        }
+
+        return WindowData.WindowType.None;
+    }
+
+    /// <summary>
     /// キャッシュの削除
     /// </summary>
     /// <param name="type"></param>
@@ -113,5 +148,17 @@ public class WindowManager : SingletonMonoBehaviour<WindowManager>
         {
             _windowDict.Remove(type);
         }
+    }
+
+    /// <summary>
+    /// キャンバスの作成
+    /// </summary>
+    void CreateRootCanvas()
+    {
+        var prefab = Resources.Load(WINDOW_ROOT_CANVAS_PATH);
+        var canvasObject = Instantiate(prefab) as GameObject;
+        canvasObject.name = prefab.name;
+
+        _rootCanvas = canvasObject.GetComponent<Canvas>();
     }
 }

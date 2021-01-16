@@ -2,6 +2,8 @@
  
 public class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 {
+    private static bool isApplicationQuitting = false;
+
     private static T instance;
     public static T Instance
     {
@@ -28,10 +30,8 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
                 return instance;
             }
 
-            if (instance == null)
+            if (instance == null && !isApplicationQuitting)
             {
-                Debug.Log("<color=yellow>" + typeof(T) + "がないからつくるで</color>");
-
                 var obj = new GameObject(typeof(T).ToString());
                 instance = obj.AddComponent(typeof(T)) as T;
             }
@@ -48,11 +48,10 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     }
 
     /// <summary>
-    /// 削除時に呼ばれる処理
+    /// アプリケーションが終了する直前に呼ばれる処理
     /// </summary>
-    void OnDestroy()
+    void OnApplicationQuit()
     {
-        // インスタンスの初期化
-        instance = null;
+        isApplicationQuitting = true;
     }
 }

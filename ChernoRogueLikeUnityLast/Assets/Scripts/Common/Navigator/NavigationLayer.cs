@@ -80,7 +80,7 @@ public class NavigationLayer : MonoBehaviour
             }
 
             // defaultIndexの更新
-            if(_isUpdateDefaultIndex)
+            if(_currentNavigator != null && _isUpdateDefaultIndex)
             {
                 SetDefaultIndex(GetCurrentIndex());
             }
@@ -150,6 +150,12 @@ public class NavigationLayer : MonoBehaviour
 
         // ナビゲーターの更新
         UpdateNavigatAction(inputManager);
+
+        // カレントナビゲーターの入力チェック
+        if(CurrentNavigator != null && CurrentNavigator.gameObject.activeInHierarchy)
+        {
+            CurrentNavigator.KeyUpdate(inputManager);
+        }
     }
 
     /// <summary>
@@ -556,7 +562,30 @@ public class NavigationLayer : MonoBehaviour
     /// </summary>
     public void SetVerticalNavigtor()
     {
-        SetSelectNavigator(true, false);
+        //SetSelectNavigator(true, false);
+
+        Navigator up = null;
+        Navigator down = null;
+
+        // ナビゲーターリスト順で設定する
+        for (var i = 0; i < _navigatorList.Count; i++)
+        {
+            up = null;
+            down = null;
+
+            // 上側の設定
+            if (i > 0)
+            {
+                up = _navigatorList[i - 1];
+            }
+            // 下側の設定
+            if (i + 1 < _navigatorList.Count)
+            {
+                down = _navigatorList[i + 1];
+            }
+
+            _navigatorList[i].SetVerticalNavigator(up, down);
+        }
     }
 
     /// <summary>
@@ -564,7 +593,29 @@ public class NavigationLayer : MonoBehaviour
     /// </summary>
     public void SetHorizontalNavigtor()
     {
-        SetSelectNavigator(false, true);
+        //SetSelectNavigator(false, true);
+        Navigator left = null;
+        Navigator right = null;
+
+        // ナビゲーターリスト順で設定する
+        for (var i = 0; i < _navigatorList.Count; i++)
+        {
+            left = null;
+            right = null;
+
+            // 左側の設定
+            if (i > 0)
+            {
+                left = _navigatorList[i - 1];
+            }
+            // →側の設定
+            if (i + 1 < _navigatorList.Count)
+            {
+                right = _navigatorList[i + 1];
+            }
+
+            _navigatorList[i].SetHorizontalNavigator(left, right);
+        }
     }
 
     /// <summary>
@@ -580,21 +631,27 @@ public class NavigationLayer : MonoBehaviour
     /// </summary>
     private void SetSelectNavigator(bool isVertical, bool isHorizontal)
     {
-        if(_navigatorList.Count == 0 || isVertical == isHorizontal == false)
+        if(_navigatorList.Count == 0 || !isVertical && !isHorizontal)
         {
             return;
         }
+
+        Navigator up = null;
+        Navigator down = null;
+        Navigator left = null;
+        Navigator right = null;
 
         // 距離を調べて最適なものを設定する
         for (var i = 0; i < _navigatorList.Count; i++)
         {
             var baseNavi = _navigatorList[i];
-            Navigator up    = null;
-            Navigator down  = null;
-            Navigator left  = null;
-            Navigator right = null;
 
-            for(var j = 0; j < _navigatorList.Count; j++)
+            up = null;
+            down = null;
+            left = null;
+            right = null;
+
+            for (var j = 0; j < _navigatorList.Count; j++)
             {
                 if(baseNavi == _navigatorList[j])
                 {
@@ -712,21 +769,26 @@ public class NavigationLayer : MonoBehaviour
     /// <returns></returns>
     public bool SetCurrentNavigatorFromIndex(int index)
     {
-        var result = false;
-
         if(_navigatorList.Count == 0)
         {
-            return result;
+            return false;
         }
 
         // CurrentNavigatorの設定
-        if(index < _navigatorList.Count)
+        if(index < 0)
+        {
+            CurrentNavigator = _navigatorList[0];
+        }
+        else if(index < _navigatorList.Count)
         {
             CurrentNavigator = _navigatorList[index];
-            result = true;
+        }
+        else
+        {
+            CurrentNavigator = _navigatorList[_navigatorList.Count - 1];
         }
 
-        return result;
+        return true;
     }
 
     #endregion
