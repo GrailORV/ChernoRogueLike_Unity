@@ -1,6 +1,4 @@
-﻿#define MAP_CREATE_TEST
-
-using System;
+﻿using System;
 using System.IO;
 using UnityEngine;
 
@@ -18,35 +16,60 @@ namespace Dungeon
 		/// <summary>マップデータ</summary>
 		private DungeonCellData[,]	_mapData = null;
 
-		private Sprite[]	terrainSprites = null;
+		private Sprite[]	_terrainSprites	= null;
+		private Sprite[]	_itemSprites	= null;
+		private Sprite[]	_eventSprites	= null;
 
-		private GameObject[,] terrainObjects	= null;
-		private GameObject[,] itemObjects		= null;
-		private GameObject[,] eventObjects		= null;
+		private GameObject[,] _terrainObjects	= null;
+		private GameObject[,] _itemObjects		= null;
+		private GameObject[,] _eventObjects		= null;
 
-		/// <summary>地形スプライト読み込み用名前</summary>
-		private readonly string[] TerrainSpriteNames =
-		{
-			"wall",
-			"floor",
-			"water"
-		};
+		#if DEBUG
+		[SerializeField]
+		private bool _mapCreateTest	= false;
+		#endif
+
+		#region MonoBehaviour
 
 		/// <summary>
 		/// 
 		/// </summary>
 		private void Start()
 		{
-			#if MAP_CREATE_TEST
-			MAP_CREATE_DESC desc = new MAP_CREATE_DESC();
-			desc.width			= DebugmapData.Width;
-			desc.height			= DebugmapData.Height;
-			desc.terrainData	= DebugmapData.TerrainData;
-			desc.itemData		= null;
-			desc.eventData		= null;
-			desc.terrainSpriteFileName = DebugmapData.TerrainSpriteFile;
+			#if DEBUG
+			if( _mapCreateTest )
+			{
+				MAP_CREATE_DESC desc = DebugmapData.MapDesc;
+				{
+					Sprite[] sprites	= Resources.LoadAll<Sprite>( DebugmapData.TerrainSpriteFile );
+					desc.terrainSprites	= new Sprite[(int)TerrainType.Count];
+					for ( int i = 0; i < (int)TerrainType.Count; i++ )
+					{
+						string name = Enum.GetName(typeof(TerrainType), i);
+						desc.terrainSprites[i] = System.Array.Find<Sprite>( sprites, ( sprite ) => sprite.name.Equals( name ) );
+					}
+				}
+				{
+					Sprite[] sprites = Resources.LoadAll<Sprite>( DebugmapData.ItemSpriteFile );
+					desc.itemSprites = new Sprite[(int)ItemType.Count];
+					for ( int i = 0; i < (int)ItemType.Count; i++ )
+					{
+						string name = Enum.GetName( typeof( ItemType ), i );
+						desc.itemSprites[i] = System.Array.Find<Sprite>( sprites, ( sprite ) => sprite.name.Equals( name ) );
+					}
+				}
+				{
+					Sprite[] sprites = Resources.LoadAll<Sprite>( DebugmapData.EventSpriteFile );
+					desc.eventSprites = new Sprite[(int)EventType.Count];
+					for ( int i = 0; i < (int)EventType.Count; i++ )
+					{
+						string name = Enum.GetName( typeof( EventType ), i );
+						desc.eventSprites[i] = System.Array.Find<Sprite>( sprites, ( sprite ) => sprite.name.Equals( name ) );
+					}
+				}
 
-			StartUp( desc );
+				StartUp( desc );
+			}
 			#endif
 		}
 
@@ -61,8 +84,11 @@ namespace Dungeon
 			}
 
 			// 更新処理
-			// ここでスタックした各種更新処理を呼び出す（予定）
 		}
+
+		#endregion
+
+		#region public func
 
 		/// <summary>
 		/// 各種初期化処理
@@ -80,16 +106,14 @@ namespace Dungeon
 				_height = mapDesc.height;
 				_mapData = new DungeonCellData[_height, _width];
 
-				// スプライトのロード
-				Sprite[] terrainSpriteBuf = Resources.LoadAll<Sprite>( mapDesc.terrainSpriteFileName );
-				terrainSprites = new Sprite[(int)TerrainType.TYPE_MAX];
-				for( int i = 0; i < (int)TerrainType.TYPE_MAX; i++ )
-				{
-					terrainSprites[i] = System.Array.Find<Sprite>( terrainSpriteBuf, (sprite) => sprite.name.Equals(TerrainSpriteNames[i]) );
-				}
+				// スプライト設定
+				if( mapDesc.terrainSprites == null ) return false;
+				_terrainSprites	= mapDesc.terrainSprites;
+				_itemSprites	= mapDesc.itemSprites;
+				_eventSprites	= mapDesc.eventSprites;
 
 				// 固定マップの場合受け取ったデータで初期化
-				//if( mapDesc.)			← ここで固定マップ化の判定
+				if( mapDesc.isFixedMap )
 				{
 					// 少なくとも地形データがないと初期化できない
 					if( mapDesc.terrainData == null ) return false;
@@ -104,8 +128,8 @@ namespace Dungeon
 						for( int x = 0; x < _width; x++ )
 						{
 							int t = mapDesc.terrainData[y,x];
-							int i = mapDesc.itemData == null ? 0 : mapDesc.itemData[y,x];
-							int e = mapDesc.eventData == null ? 0 : mapDesc.eventData[y,x];
+							int i = mapDesc.itemData == null ? -1 : mapDesc.itemData[y,x];
+							int e = mapDesc.eventData == null ? -1 : mapDesc.eventData[y,x];
 
 							_mapData[y,x].terrain	= t;
 							_mapData[y,x].item		= i;
@@ -113,14 +137,19 @@ namespace Dungeon
 						}
 					}
 				}
+				// ランダムマップ生成
+				else
+				{
+
+				}
 
 			}
 
 			// マップオブジェクト生成
 			{
-				terrainObjects	= new GameObject[_height, _width];
-				itemObjects		= new GameObject[_height, _width];
-				eventObjects	= new GameObject[_height, _width];
+				_terrainObjects	= new GameObject[_height, _width];
+				_itemObjects	= new GameObject[_height, _width];
+				_eventObjects	= new GameObject[_height, _width];
 
 				// ルートオブジェクト生成
 				GameObject terrainRoot = new GameObject( "TerrainRoot" );
@@ -134,15 +163,45 @@ namespace Dungeon
 				{
 					for( int x = 0; x < _width; x++ )
 					{
-						// 地形オブジェクト生成
-						string terrainName = String.Format( "t_{0}{1}", y, x );
-						GameObject terrainObj = new GameObject( terrainName );
-						terrainObj.transform.position = new Vector3( x, -y, 0 );
-						terrainObj.transform.parent = terrainRoot.transform;
-						var terrainRenderer = terrainObj.AddComponent<SpriteRenderer>();
-						terrainRenderer.sprite = terrainSprites[mapDesc.terrainData[y,x]];
+						var data = _mapData[y,x];
 
-						terrainObjects[y,x] = terrainObj;
+						// 地形オブジェクト生成
+						{
+							string objName = String.Format( "t_{0}{1}", y, x );
+							GameObject terrainObj = new GameObject( objName );
+							terrainObj.transform.position = new Vector3( x, -y, DungeonObjZOrder.TerrainObjZ );
+							terrainObj.transform.parent = terrainRoot.transform;
+							var terrainRenderer = terrainObj.AddComponent<SpriteRenderer>();
+							terrainRenderer.sprite = _terrainSprites[data.terrain];
+
+							_terrainObjects[y,x] = terrainObj;
+						}
+
+						// アイテムオブジェクト生成
+						if( data.item >= 0 )
+						{
+							string objName = String.Format( "i_{0}{1}", y, x );
+							GameObject obj = new GameObject( objName );
+							obj.transform.position = new Vector3( x, -y, Dungeon.DungeonObjZOrder.ItemObjZ );
+							obj.transform.parent = itemRoot.transform;
+							var renderer = obj.AddComponent<SpriteRenderer>();
+							renderer.sprite = _itemSprites[data.item];
+
+							_itemObjects[y,x] = obj;
+						}
+
+						// イベントアイテムオブジェクト生成
+						if( data.eve >= 0 )
+						{
+							string objName = String.Format( "e_{0}{1}", y, x );
+							GameObject obj = new GameObject( objName );
+							obj.transform.position = new Vector3( x, -y, Dungeon.DungeonObjZOrder.EventObjZ );
+							obj.transform.parent = eventRoot.transform;
+							var renderer = obj.AddComponent<SpriteRenderer>();
+							renderer.sprite = _eventSprites[data.eve];
+
+							_eventObjects[y,x] = obj;
+						}
 					}
 				}
 			}
@@ -166,5 +225,11 @@ namespace Dungeon
 			_bInitialized		= false;
 
 		}
+
+		#endregion
+
+		#region private func
+
+		#endregion
 	}
 }

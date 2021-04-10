@@ -12,7 +12,19 @@ namespace Dungeon
 		Wall = 0,
 		Floor,
 		Water,
-		TYPE_MAX
+
+		Count
+	}
+
+	/// <summary>
+	/// マップアイテム列挙子
+	/// </summary>
+	public enum ItemType
+	{
+		None = -1,
+		debug_item_0,
+
+		Count
 	}
 
 	/// <summary>
@@ -20,7 +32,9 @@ namespace Dungeon
 	/// </summary>
 	public enum EventType
 	{
-		None = 0,
-		Stair
+		None = -1,
+		Stair,
+
+		Count
 	}
 }
