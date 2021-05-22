@@ -5,6 +5,13 @@ using UnityEngine;
 
 public class NavigationManager : SingletonMonoBehaviour<NavigationManager>
 {
+    // 入力モード
+    public enum InputMode
+    {
+        Single, // 単一押し
+        Multi,  // 同時押し
+    }
+
     // 入力タイプ
     public enum InputType
     {

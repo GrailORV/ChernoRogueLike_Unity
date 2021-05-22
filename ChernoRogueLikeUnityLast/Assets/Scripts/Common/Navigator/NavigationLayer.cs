@@ -13,6 +13,7 @@ public class NavigationLayer : MonoBehaviour
     [Serializable]
     public class KeyCommand
     {
+        public NavigationManager.InputMode mode = NavigationManager.InputMode.Single;
         public NavigationManager.InputType type = NavigationManager.InputType.Down;
         public NavigationManager.InputKey key;
         public List<NavigationManager.InputKey> keys;
@@ -850,5 +851,18 @@ public class NavigationLayer : MonoBehaviour
         SetCurrentNavigatorFromIndex(_defaultNavigatorIndex);
     }
 
+    #endregion
+
+    #region Editor
+
+    /// <summary>
+    /// エディタ拡張に使用する関数です。
+    /// それ以外では使用しないでください
+    /// </summary>
+    /// <returns></returns>
+    public List<KeyCommand> GetCommandList()
+    {
+        return _commandList;
+    }
     #endregion
 }
