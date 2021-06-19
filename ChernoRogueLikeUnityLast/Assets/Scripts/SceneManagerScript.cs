@@ -2,21 +2,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneManagerScript : MonoBehaviour
+public class SceneManagerScript : SingletonMonoBehaviour<SceneManagerScript>
 {
     [HideInInspector]
     public List<string> sceneNameList;
 
     public static SceneManagerScript script = null;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void CreateSceneManager()
-    {
-        GameObject prefab = Resources.Load("Prefabs/SceneManager") as GameObject;
-        var obj = Instantiate(prefab);
-        DontDestroyOnLoad(obj);
-        script = obj.GetComponent<SceneManagerScript>();
-    }
 
     public void SetScene(int index)
     {

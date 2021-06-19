@@ -1,0 +1,10 @@
+{
+    "name": "Dungeon",
+    "references": [
+        "Core"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
